@@ -1,27 +1,36 @@
+// @ts-nocheck
 'use client'
 
-'use client'
+// Внешние библиотеки
+import React from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-import Image from 'next/image'
-import styles from '@/app/css/mainpage.module.css'
-import productStyles from '@/app/css/product.module.css'
+// Компоненты
+import Image from 'next/image';
+import { Forms } from '@/app/components/Forms';
+import { Loader } from '@/app/components/micro/Loader';
+import { Stars } from '@/app/components/shop/Star';
+import { ButtonProduct } from '@/app/components/shop/ButtonProduct';
+// Хуки
+import { useActions } from '@/hooks/useActions';
+import { useCustomers, useStater } from '@/hooks/useStater';
 
-import {useRouter} from 'next/navigation'
-import {useEffect, useState} from 'react';
+// Стили
+import styles from '@/app/css/mainpage.module.css';
+import productStyles from '@/app/css/product.module.css';
 
-import { useActions } from '@/hooks/useActions'
-import {useCustomers, useStater} from '@/hooks/useStater'
+// API запросы
+import { useGetProductQuery } from "@/redux/api/products.api";
+import returnResultProduct from '@/app/workers/resultProductsWorker';
 
-import {useGetProductQuery} from "@/redux/api/products.api"
-import {Forms} from "@/app/components/Forms";
-import {Loader} from "@/app/components/micro/Loader";
+
 
 ///Вообще тут будет получение товара через fetch а пока так
 export default function Home({params}) {
 
   const decodeParams = Number.parseInt(decodeURI(params.slug))
 
-  const router = useRouter();
   const customer = useCustomers();
 
   const [quantity, setQuantity] = useState(1);
@@ -33,8 +42,22 @@ export default function Home({params}) {
 
   const {addToCart} = useActions();
 
+
+
+  // Получение данных из объекта 
+  const stock = data?.data?.attributes?.stock ?? 0; 
+  const imgs = data?.data?.attributes?.imgs?.data ?? '';
+  const imgData = data?.data?.attributes?.imgs?.data ?? '';
+  const imgDataFirst = data?.data?.attributes.imgs.data?.[0] ?? '';
+  const imgUrl = data?.data?.attributes?.imgs?.data?.[0]?.attributes?.url?? '';
+  const imgAlt = data?.data?.attributes?.imgs?.data?.[0]?.attributes?.alt?? '';
+  const title = data?.data?.attributes?.title?? '';
+  const price = data?.data?.attributes?.price?? '';
+  const priceOpt = data?.data?.attributes?.priceOpt?? '';
+  const description = data?.data?.attributes?.description?? '';
+
   const plus = () => {
-    if(quantity < data.data.attributes.stock) {
+    if(quantity < stock) {
       setQuantity(quantity + 1)
     }
   }
@@ -44,30 +67,9 @@ export default function Home({params}) {
     }
   }
 
+
   const handleAddToCart = (item) => {
-    const resultProduct = {
-      id: item.id,
-      id1c: (item.attributes?.id1c) ? item.attributes.id1c : '',
-      category: (item.attributes?.categories?.data) ? item.attributes.categories.data.map(item => item.id) : [],
-      image: (item.attributes?.imgs?.data) ? item.attributes.imgs.data.map(item => item.attributes.url) : '/noImage.jpg',
-      title: item.attributes?.title,
-      description: item.attributes?.description, //Сейчас нету, так на будущее
-      stock: Number.parseInt(item.attributes.stock),
-      storeplace: item.attributes.storeplace,
-      attributes: (item.attributes.Attributes?.attributes) ? item.attributes.Attributes.attributes.map(item => {
-        if(item.type === "Number") {
-          return({
-            name: item.name,
-            type: item.type,
-            value: Number.parseInt(item.value)
-          })
-        }
-        return item
-      }) : [],
-      quantitySales: Number.parseInt(item.attributes.quantitySales),
-      price: (!isNaN(Number.parseInt(item.attributes.price)) ? Number.parseInt(item.attributes.price) : 1 ),
-      priceOpt: item.attributes.priceOpt,
-    }
+    const resultProduct = returnResultProduct(item);
     const makeMutableProduct = {...resultProduct};
           makeMutableProduct.quantityForBuy = quantity;
           addToCart(makeMutableProduct);
@@ -90,37 +92,41 @@ export default function Home({params}) {
     //console.log(customer.type)
   },[customer])
 
+
+
+
   return (
     <>
     <main className={styles.main}>
+    
       {
         (!isLoading) ?
            (data?.data) ?
                         <section className = {productStyles.singleProduct}>
-                            <h1 className = {`${productStyles.title}`}>{data.data.attributes.title} </h1>
+                            <h1 className = {`${productStyles.title}`}>{title} </h1>
                             <article className = {`${productStyles.imageBlock}`}>
                               {
-                                (typeof data != 'undefined' && data.data.attributes.imgs && Array.isArray(data.data.attributes.imgs.data) && data.data.attributes.imgs.data[0]) ?
+                                (typeof data != 'undefined' && imgs && Array.isArray(imgData) && imgDataFirst) ?
                                         <div className = {`${productStyles.singleProductImg}`}>
-                                          <Image unoptimized unoptimized src = {`${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_URL_API}${data.data.attributes.imgs.data[0].attributes.url}`} alt = {data.data.attributes.imgs.data[0].attributes.alt} fill />
+                                          <Image unoptimized src = {`${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_URL_API}${imgUrl}`} alt = {imgAlt} fill />
                                         </div>
                                     :
-                                        <div className = {`${productStyles.singleProductImg}`}>
-                                          <Image unoptimized unoptimized src= {`/noImage.jpg`} alt = {data.data.attributes.title} fill />
-                                        </div>
+                                    <div className={productStyles.singleProductImg}>
+                                      <Image unoptimized src="/noImage.jpg" alt={title} fill />
+                                    </div>
                               }
                             </article>
                             <article className = {`${productStyles.infoBlock}`}>
 
                               <div className = {`${productStyles.singleProductStock}`}>
                                 {
-                                  (typeof data.data != 'undefined' && data.data?.attributes?.price) ?
+                                  (typeof data.data != 'undefined' && price) ?
                                       <>
-                                        <h2>{` ${(customer.authStatus && customer.type == "Оптовый покупатель") ? (data.data?.attributes.priceOpt) ? "Оптовая цена: " + data.data?.attributes.priceOpt : data.data?.attributes.price : data.data?.attributes.price} ₽`}</h2>
+                                        <h2>{` ${(customer.authStatus && customer.type == "Оптовый покупатель") ? (priceOpt) ? "Оптовая цена: " + data.data?.attributes.priceOpt : priceprice : price} ₽`}</h2>
 
                                         <div className = {`${productStyles.stock}`}>
                                           {
-                                            (data.data.attributes.stock > 0 ) ? (<><svg xmlns="https://www.w3.org/2000/svg" width="12" height="11" viewBox="0 0 12 11" fill="none">
+                                            (stock > 0 ) ? (<><svg xmlns="https://www.w3.org/2000/svg" width="12" height="11" viewBox="0 0 12 11" fill="none">
                                             <path d="M1 5.5L5 9.5L11 1.5" stroke="#262626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                             </svg><span> В наличии</span></>) : (<><svg xmlns="https://www.w3.org/2000/svg" width="12" height="11" viewBox="0 0 12 11" fill="none">
                                               <path d="M1 5.5L5 9.5L11 1.5" stroke="#262626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -132,7 +138,7 @@ export default function Home({params}) {
                                       <>
                                         <div style = {{marginLeft: "0"}} className = {`${productStyles.stock}`}>
                                           {
-                                            (data.data.attributes.stock > 0 ) ? (<><svg xmlns="https://www.w3.org/2000/svg" width="12" height="11" viewBox="0 0 12 11" fill="none">
+                                            (stock > 0 ) ? (<><svg xmlns="https://www.w3.org/2000/svg" width="12" height="11" viewBox="0 0 12 11" fill="none">
                                               <path d="M1 5.5L5 9.5L11 1.5" stroke="#262626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                             </svg><span> В наличии</span></>) : (<><span> Нет в наличии</span></>)
                                           }
@@ -141,37 +147,17 @@ export default function Home({params}) {
                                 }
                               </div>
 
-                              <div className = {productStyles.singleProductAddToCart}>
-                                {
-                                  (data.data.attributes.stock) ?
-                                      <>
-                                        <div className = {`${productStyles.productCardQuntity}`}>
-                                          <button onClick ={minus} className = {`${productStyles.productCardButton}`}><Image unoptimized src = {"/minus.svg"} alt = "Кнопка для уменьшения количества товара" fill/></button>
-                                          <p>{quantity}</p>
-                                          <button onClick ={plus} className = {`${productStyles.productCardButton}`}><Image unoptimized src = {"/plus.svg"}  alt = "Кнопка для увеличения количества товара" fill/></button>
-                                        </div>
-                                        <button
-                                            onClick = {() => handleAddToCart(data.data)}
-                                            className = {`${productStyles.addToCartButton}`}>
-                                          {textToCart}
-                                        </button>
-                                      </>
-                                          :
-                                      <>
-                                        <div className = {`${productStyles.productCardQuntity}`}>
-                                          <button onClick ={minus} className = {`${productStyles.productCardButton}`}><Image unoptimized src = {"/minus.svg"} alt = "Кнопка для уменьшения количества товара" fill/></button>
-                                          <p>{quantity}</p>
-                                          <button onClick ={plus} className = {`${productStyles.productCardButton}`}><Image unoptimized src = {"/plus.svg"}  alt = "Кнопка для увеличения количества товара" fill/></button>
-                                        </div>
-                                        <button
-                                            onClick = {() => handleAddToCart(data.data)}
-                                            className = {`${productStyles.addToCartButton}`}>
-                                            Предзаказ
-                                        </button>
-                                      </>
-                                }
+                              <ButtonProduct
+                                stock={stock}
+                                quantity={quantity}
+                                handleAddToCart={handleAddToCart}
+                                minus={minus}
+                                plus={plus}
+                                textToCart={textToCart}
+                                productStyles={productStyles}
+                                data={data}
+                              />
 
-                              </div>
                               <div className = {`${productStyles.attrBlock}`}>
                                 <h3 className = {`${productStyles.attrHeader}`}>Характеристики</h3>
                                 <div className = {`${productStyles.attrList}`}>
@@ -221,7 +207,7 @@ export default function Home({params}) {
                                          className={`${productStyles.termsBlock}`}>
                                          <p>
                                            {
-                                             (data?.data?.attributes.description) ? data?.data?.attributes.description : null
+                                             (description) ? description : null
                                            }
                                        </p>
                                      </div>
@@ -287,25 +273,3 @@ export default function Home({params}) {
   )
 }
 
-
-const Stars = ({count = 0}) => {
-
-  const [stars, setStars] = useState(['0','0','0','0','0'])
-
-  useEffect(() => {
-  },[count])
-  return(
-      <div>
-        {
-          stars.map((item, index) => {
-            return(
-                <svg key = {`key_start_${index}${item.id}`} xmlns="https://www.w3.org/2000/svg" width="16" height="15" viewBox="0 0 16 15" fill={`#${(index+1 <= count) ? 'FECC00' : 'FFFFFF'}`}>
-                  <path d="M7.52447 1.08156C7.67415 0.620903 8.32585 0.620904 8.47553 1.08156L9.5451 4.37336C9.74591 4.99139 10.3218 5.40983 10.9717 5.40983H14.4329C14.9172 5.40983 15.1186 6.02964 14.7268 6.31434L11.9266 8.34878C11.4009 8.73075 11.1809 9.4078 11.3817 10.0258L12.4513 13.3176C12.6009 13.7783 12.0737 14.1613 11.6818 13.8766L8.88168 11.8422C8.35595 11.4602 7.64405 11.4602 7.11832 11.8422L4.31815 13.8766C3.9263 14.1613 3.39906 13.7783 3.54873 13.3176L4.6183 10.0258C4.81911 9.4078 4.59913 8.73075 4.07339 8.34878L1.27323 6.31434C0.881369 6.02964 1.08276 5.40983 1.56712 5.40983H5.02832C5.67816 5.40983 6.25409 4.99139 6.4549 4.37336L7.52447 1.08156Z" stroke="#FECC00"/>
-                </svg>
-                )
-          })
-        }
-
-      </div>
-  )
-}

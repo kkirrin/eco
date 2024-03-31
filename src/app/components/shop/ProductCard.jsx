@@ -7,6 +7,7 @@ import Link from "next/link"
 import styles from '@/app/css/shop.module.css'
 import productStyles from '@/app/css/product.module.css'
 import {useCustomers} from "@/hooks/useStater";
+import React from "react"
 
 export const ProductCard = ({item = {
     id: 1,
@@ -69,17 +70,19 @@ export const ProductCard = ({item = {
                     {
                         (product) ?
                         (Array.isArray(product?.image[0])) ?
-                            <Image unoptimized unoptimized src= {`${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_URL_API}${product?.image[0]}`} alt = {product.title} fill />
+                            // @ts-ignore
+                            <Image unoptimized src= {`${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_URL_API}${product?.image[0]}`} alt = {product.title} fill />
                                            :
+                            // @ts-ignore
                             (product?.image) ?
-                               <Image unoptimized unoptimized src= {`${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_URL_FRONT}${product?.image}`} alt = {product.title} fill />
+                               <Image unoptimized src= {`${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_URL_FRONT}${product?.image}`} alt = {product.title} fill />
                                 :
                                 <div className = {`${productStyles.singleProductImg}`}>
-                                    <Image unoptimized unoptimized src= {`/noImage.jpg`} alt = {product.title} fill />
+                                    <Image unoptimized src= {`/noImage.jpg`} alt = {product.title} fill />
                                 </div>
                             :
                             <div className = {`${productStyles.singleProductImg}`}>
-                                <Image unoptimized unoptimized src= {`/noImage.jpg`} alt = {product.title} fill />
+                                <Image unoptimized src= {`/noImage.jpg`} alt = {product.title} fill />
                             </div>
                     }
                 </div>
