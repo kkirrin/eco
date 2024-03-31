@@ -1,0 +1,25 @@
+{
+  "name": "front",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "pbuild": "NODE_ENV=production next build",
+    "pstart": "NODE_ENV=production next start"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.9.5",
+    "eslint": "8.46.0",
+    "eslint-config-next": "13.4.12",
+    "next": "13.4.12",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-fast-marquee": "^1.6.3",
+    "react-lottie": "^1.2.3",
+    "react-redux": "^8.1.2",
+    "uuid": "^9.0.1"
+  }
+}
