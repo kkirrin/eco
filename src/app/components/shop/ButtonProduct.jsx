@@ -1,9 +1,9 @@
 import React from "react";
 import Image from 'next/image';
-import productStyles from "../../css/product.module.css";
+import productStyles from '@/app/css/product.module.css';
 
 
-export const ButtonProduct = ({ stock, quantity, handleAddToCart, minus, plus, textToCart, productStyles, data }) => {
+export const ButtonProduct = ({ stock, quantity, handleAddToCart, minus, plus, textToCart, data }) => {
   return (
     <div className={productStyles.singleProductAddToCart}>
       <div className={productStyles.productCardQuantity}>

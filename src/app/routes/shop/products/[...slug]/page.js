@@ -7,11 +7,13 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 // Компоненты
-import Image from 'next/image';
 import { Forms } from '@/app/components/Forms';
 import { Loader } from '@/app/components/micro/Loader';
 import { Stars } from '@/app/components/shop/Star';
 import { ButtonProduct } from '@/app/components/shop/ButtonProduct';
+import { StateProduct } from '@/app/components/shop/StateProduct';
+import { ImageProduct } from '@/app/components/shop/ImageProduct';
+import { FeatureProduct } from '@/app/components/shop/FeatureProduct';
 // Хуки
 import { useActions } from '@/hooks/useActions';
 import { useCustomers, useStater } from '@/hooks/useStater';
@@ -55,6 +57,7 @@ export default function Home({params}) {
   const price = data?.data?.attributes?.price?? '';
   const priceOpt = data?.data?.attributes?.priceOpt?? '';
   const description = data?.data?.attributes?.description?? '';
+  const attributes = data?.data?.attributes?.Attributes?? '';
 
   const plus = () => {
     if(quantity < stock) {
@@ -105,48 +108,31 @@ export default function Home({params}) {
                         <section className = {productStyles.singleProduct}>
                             <h1 className = {`${productStyles.title}`}>{title} </h1>
                             <article className = {`${productStyles.imageBlock}`}>
-                              {
-                                (typeof data != 'undefined' && imgs && Array.isArray(imgData) && imgDataFirst) ?
-                                        <div className = {`${productStyles.singleProductImg}`}>
-                                          <Image unoptimized src = {`${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_URL_API}${imgUrl}`} alt = {imgAlt} fill />
-                                        </div>
-                                    :
-                                    <div className={productStyles.singleProductImg}>
-                                      <Image unoptimized src="/noImage.jpg" alt={title} fill />
-                                    </div>
-                              }
+
+                              <ImageProduct 
+                                imgs={imgs} 
+                                imgData={imgData} 
+                                imgDataFirst={imgDataFirst}
+                                data={data}
+                                title={title}
+                                imgUrl={imgUrl}
+                                imgAlt={imgAlt}
+                              />
+          
                             </article>
                             <article className = {`${productStyles.infoBlock}`}>
 
                               <div className = {`${productStyles.singleProductStock}`}>
-                                {
-                                  (typeof data.data != 'undefined' && price) ?
-                                      <>
-                                        <h2>{` ${(customer.authStatus && customer.type == "Оптовый покупатель") ? (priceOpt) ? "Оптовая цена: " + data.data?.attributes.priceOpt : priceprice : price} ₽`}</h2>
-
-                                        <div className = {`${productStyles.stock}`}>
-                                          {
-                                            (stock > 0 ) ? (<><svg xmlns="https://www.w3.org/2000/svg" width="12" height="11" viewBox="0 0 12 11" fill="none">
-                                            <path d="M1 5.5L5 9.5L11 1.5" stroke="#262626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                            </svg><span> В наличии</span></>) : (<><svg xmlns="https://www.w3.org/2000/svg" width="12" height="11" viewBox="0 0 12 11" fill="none">
-                                              <path d="M1 5.5L5 9.5L11 1.5" stroke="#262626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                            </svg><span> Нет в наличии</span></>)
-                                          }
-                                        </div>
-                                      </>
-                                      :
-                                      <>
-                                        <div style = {{marginLeft: "0"}} className = {`${productStyles.stock}`}>
-                                          {
-                                            (stock > 0 ) ? (<><svg xmlns="https://www.w3.org/2000/svg" width="12" height="11" viewBox="0 0 12 11" fill="none">
-                                              <path d="M1 5.5L5 9.5L11 1.5" stroke="#262626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                            </svg><span> В наличии</span></>) : (<><span> Нет в наличии</span></>)
-                                          }
-                                        </div>
-                                      </>
-                                }
+                                {/* Показывает цену и В наличии */}
+                                <StateProduct 
+                                  data={data} 
+                                  price={price} 
+                                  stock={stock} 
+                                  priceOpt={priceOpt}
+                                />
                               </div>
 
+                              {/* Отрисовывает кнопки для добавления */}
                               <ButtonProduct
                                 stock={stock}
                                 quantity={quantity}
@@ -158,22 +144,9 @@ export default function Home({params}) {
                                 data={data}
                               />
 
-                              <div className = {`${productStyles.attrBlock}`}>
-                                <h3 className = {`${productStyles.attrHeader}`}>Характеристики</h3>
-                                <div className = {`${productStyles.attrList}`}>
-                                  {
-                                    (data.data.attributes.Attributes) ? () => {
-                                      return(
-                                          Object.entries(data.data.attributes.Attributes).map(([key, value],index) => {
-                                            return(
-                                                <div key = {`${key}_${index}`} className = {`${productStyles.attrRow}`}><p>{key}</p><p></p><p>{value}</p></div>
-                                            )
-                                          })
-                                      )
-                                    } : <p style = {{color: 'red',}}>У товара не определены характеристики</p>
-                                  }
-                                </div>
-                              </div>
+                              <FeatureProduct
+                                  attributes={attributes}
+                              />
 
                             </article>
 
