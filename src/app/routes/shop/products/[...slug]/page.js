@@ -49,6 +49,8 @@ export default function Home({params}) {
 
   // Получение данных из объекта 
   const stock = data?.data?.attributes?.stock ?? 0; 
+  console.log(stock)
+  
   const imgs = data?.data?.attributes?.imgs?.data ?? '';
   const imgData = data?.data?.attributes?.imgs?.data ?? '';
   const imgDataFirst = data?.data?.attributes.imgs.data?.[0] ?? '';
@@ -59,8 +61,8 @@ export default function Home({params}) {
   const priceOpt = data?.data?.attributes?.priceOpt?? '';
   const description = data?.data?.attributes?.description?? '';
   const attributes = data?.data?.attributes?.Attributes?? '';
-  const reviews = data?.data?.attributes?.otzyvy_tovaries?.data.length;
-  const reviewsData = data?.data?.attributes?.otzyvy_tovaries?.data;
+  const reviewsLength = data?.data?.attributes?.otzyvy_tovaries?.data.length ?? 0;
+  const reviewsData = data?.data?.attributes?.otzyvy_tovaries?.data ?? '';
 
 
   const plus = () => {
@@ -158,7 +160,7 @@ export default function Home({params}) {
 
                             <TabsProduct 
                               data={data}
-                              reviews={reviews} 
+                              reviewsLength={reviewsLength} 
                               description={description}
                               isLoading={isLoading}
                               params={params}

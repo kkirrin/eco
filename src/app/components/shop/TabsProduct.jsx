@@ -13,7 +13,7 @@ import { Stars } from './Star';
 
 export const TabsProduct = ({ 
     data, 
-    reviews, 
+    reviewsLength, 
     description, 
     isLoading, 
     reviewsData,
@@ -38,7 +38,7 @@ export const TabsProduct = ({
                     color: (selectTab == 1) ? "#ffffff" : '',
                     backgroundColor: (selectTab == 1) ? "#262626" : '',
                 }}
-                onClick = {() => setSelectTab(1)} onTouchStart={() => setSelectTab(1)} className = {`${(selectTab == 0) ? productStyles.activeButton : null}`}>Отзывы ({data && reviews})</button>
+                onClick = {() => setSelectTab(1)} onTouchStart={() => setSelectTab(1)} className = {`${(selectTab == 0) ? productStyles.activeButton : null}`}>Отзывы ({data && reviewsLength})</button>
                 <button
                     style = {{
                         color: (selectTab == 2) ? "#ffffff" : '',
@@ -46,7 +46,6 @@ export const TabsProduct = ({
                     }}
                     onClick = {() => setSelectTab(2)} onTouchStart={() => setSelectTab(2)} className = {`${(selectTab == 0) ? productStyles.activeButton : null}`}>Задать вопрос</button>
             </div>
-
 
             {
                 (selectTab === 0) ?
