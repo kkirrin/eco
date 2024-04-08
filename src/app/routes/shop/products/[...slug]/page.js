@@ -14,6 +14,7 @@ import { ButtonProduct } from '@/app/components/shop/ButtonProduct';
 import { StateProduct } from '@/app/components/shop/StateProduct';
 import { ImageProduct } from '@/app/components/shop/ImageProduct';
 import { FeatureProduct } from '@/app/components/shop/FeatureProduct';
+import { TabsProduct } from '@/app/components/shop/TabsProduct';
 // Хуки
 import { useActions } from '@/hooks/useActions';
 import { useCustomers, useStater } from '@/hooks/useStater';
@@ -58,6 +59,9 @@ export default function Home({params}) {
   const priceOpt = data?.data?.attributes?.priceOpt?? '';
   const description = data?.data?.attributes?.description?? '';
   const attributes = data?.data?.attributes?.Attributes?? '';
+  const reviews = data?.data?.attributes?.otzyvy_tovaries?.data.length;
+  const reviewsData = data?.data?.attributes?.otzyvy_tovaries?.data;
+
 
   const plus = () => {
     if(quantity < stock) {
@@ -152,89 +156,15 @@ export default function Home({params}) {
 
                             <article className = {`${productStyles.downBlock}`}>
 
-                              <div className={`${productStyles.tabsContainer}`}>
-                                  <button
-                                      style = {{
-                                        color: (selectTab == 0) ? "#ffffff" : '',
-                                        backgroundColor: (selectTab == 0) ? "#262626" : '',
-                                      }}
-                                      onClick = {() => setSelectTab(0)} onTouchStart={() => setSelectTab(0)} className = {`${(selectTab == 0) ? productStyles.activeButton : null}`}>Описание</button>
-                                  <button
-                                      style = {{
-                                        color: (selectTab == 1) ? "#ffffff" : '',
-                                        backgroundColor: (selectTab == 1) ? "#262626" : '',
-                                      }}
-                                      onClick = {() => setSelectTab(1)} onTouchStart={() => setSelectTab(1)} className = {`${(selectTab == 0) ? productStyles.activeButton : null}`}>Отзывы ({data.data && data.data?.attributes?.otzyvy_tovaries?.data.length})</button>
-                                  <button
-                                      style = {{
-                                        color: (selectTab == 2) ? "#ffffff" : '',
-                                        backgroundColor: (selectTab == 2) ? "#262626" : '',
-                                      }}
-                                      onClick = {() => setSelectTab(2)} onTouchStart={() => setSelectTab(2)} className = {`${(selectTab == 0) ? productStyles.activeButton : null}`}>Задать вопрос</button>
-                              </div>
-
-                              {
-                                (selectTab === 0) ?
-                                     <div
-                                         key = {`key_tab_${selectTab}`}
-                                         className={`${productStyles.termsBlock}`}>
-                                         <p>
-                                           {
-                                             (description) ? description : null
-                                           }
-                                       </p>
-                                     </div>
-                                      : null
-                              }
-                              {
-                                (selectTab === 1) ?
-                                    <div key = {`key_tab_${selectTab}`} className={`${productStyles.reviewsContainer}`}>
-                                      <p>
-                                         Отзывы о товаре
-                                      </p>
-                                      {
-                                        (!isLoading) ?
-                                            (data.data && data.data?.attributes?.otzyvy_tovaries?.data) ?
-                                                 data.data?.attributes?.otzyvy_tovaries?.data.map( item => {
-                                                  return(
-                                                      <div className={`${productStyles.oneReview}`}>
-                                                        <div className={`${productStyles.userBlock}`}>
-                                                          <div className={`${productStyles.userAvatarReview}`}></div>
-                                                          <h3>{item.attributes.Name}</h3>
-                                                          <p>
-                                                            {
-                                                              item.attributes.Date
-                                                            }
-                                                          </p>
-                                                        </div>
-                                                        <div className={`${productStyles.starsBlock}`}>
-                                                          <Stars count = {item.attributes.Stars} />
-                                                        </div>
-                                                        <p>
-                                                          {
-                                                            item.attributes.FullText
-                                                          }
-                                                        </p>
-
-                                                      </div>
-                                                  )
-                                                })
-                                                : <p style = {{color: 'red',}}>Отзывов еще нет</p>
-                                                :  <Loader />
-                                      }
-                                      {
-                                        (customer.authStatus) ? <Forms place = {"reviews"} idItems = {(decodeParams) ? decodeParams : 0}/> : null
-                                      }
-                                    </div>
-                                    : null
-                              }
-                              {
-                                (selectTab === 2) ?
-                                    <div key = {`key_tab_${selectTab}`} className={`${productStyles.callbackBlock}`}>
-                                      <Forms place={'product'} />
-                                    </div>
-                                    : null
-                              }
+                            <TabsProduct 
+                              data={data}
+                              reviews={reviews} 
+                              description={description}
+                              isLoading={isLoading}
+                              params={params}
+                              reviewsData={reviewsData}
+                              decodeParams={decodeParams}
+                            />
 
                             </article>
                         </section>
