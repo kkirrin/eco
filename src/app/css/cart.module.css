@@ -228,7 +228,7 @@
     max-width: 15px;
     max-height: 15px;
 }
-.productCardQuntity {
+.productCardQuantity {
     position: relative;
     height: 30px;
     max-height: 100px;
@@ -262,7 +262,7 @@
     top: 0;
     right: -150vw;
 }
-.productCardQuntity p {
+.productCardQuantity p {
     width: 25%;
     border: none;
     display: flex;
@@ -526,7 +526,7 @@
         justify-content: space-between;
         width: 32%;
     }
-    .productCardQuntity {
+    .productCardQuantity {
         position: relative;
         height: 31%;
         max-height: 100px;
@@ -540,7 +540,7 @@
         border: 1px solid rgba(0, 0, 0, 0.40);
         margin-bottom: 16px;
     }
-    .productCardQuntity p {
+    .productCardQuantity p {
         width: 25%;
         border: none;
         display: flex;

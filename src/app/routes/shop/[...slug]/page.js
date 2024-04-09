@@ -32,7 +32,7 @@ export default function Page({}) {
   const [categoryFilter, setCategoryFilter] = useState(-1) //ПЛОХО СО СТАРОГО ПРОЕКТА
   const [showFilters, setShowFilters] = useState(false)
   const [pageNubmer, setPageNumber] = useState(1)
-  const [categoriesPag, steCategoriesPag] = useState([]);
+  const [categoriesPag, setCategoriesPag] = useState([]);
   const {isLoading, error, data } = useGetCategoriesQuery();
 
   const filters = useFilters()
@@ -40,7 +40,7 @@ export default function Page({}) {
   useEffect(() => {
     if (!isLoading) {
       if (data) {
-        steCategoriesPag(data.data.filter(item => item.attributes.parent.data == null && item.id == slug).map(item => item.attributes.childs.data.map((item, index) => item.id)))
+        setCategoriesPag(data.data.filter(item => item.attributes.parent.data == null && item.id == slug).map(item => item.attributes.childs.data.map((item, index) => item.id)))
       }
     }
   }

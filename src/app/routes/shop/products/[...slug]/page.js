@@ -12,10 +12,10 @@ import { Loader } from '@/app/components/micro/Loader';
 import { Stars } from '@/app/components/shop/Star';
 import { ButtonProduct } from '@/app/components/shop/ButtonProduct';
 import { StateProduct } from '@/app/components/shop/StateProduct';
-import { ImageProduct } from '@/app/components/shop/ImageProduct';
+// import { ImageProduct } from '@/app/components/shop/ImageProduct';
+import { IntoProductImagesSlider } from '@/app/components/shop/IntoProductImagesSlider';
 import { FeatureProduct } from '@/app/components/shop/FeatureProduct';
 import { TabsProduct } from '@/app/components/shop/TabsProduct';
-// Хуки
 import { useActions } from '@/hooks/useActions';
 import { useCustomers, useStater } from '@/hooks/useStater';
 
@@ -51,7 +51,7 @@ export default function Home({params}) {
   const stock = data?.data?.attributes?.stock ?? 0; 
   console.log(stock)
   
-  const imgs = data?.data?.attributes?.imgs?.data ?? '';
+  const imgs = data?.data?.attributes?.imgs ?? '';
   const imgData = data?.data?.attributes?.imgs?.data ?? '';
   const imgDataFirst = data?.data?.attributes.imgs.data?.[0] ?? '';
   const imgUrl = data?.data?.attributes?.imgs?.data?.[0]?.attributes?.url?? '';
@@ -115,15 +115,7 @@ export default function Home({params}) {
                             <h1 className = {`${productStyles.title}`}>{title} </h1>
                             <article className = {`${productStyles.imageBlock}`}>
 
-                              <ImageProduct 
-                                imgs={imgs} 
-                                imgData={imgData} 
-                                imgDataFirst={imgDataFirst}
-                                data={data}
-                                title={title}
-                                imgUrl={imgUrl}
-                                imgAlt={imgAlt}
-                              />
+                            <IntoProductImagesSlider data = {(imgs) ? imgData : null} title = {(title) ? title : null} />
           
                             </article>
                             <article className = {`${productStyles.infoBlock}`}>

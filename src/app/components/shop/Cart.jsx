@@ -476,7 +476,7 @@ const SingleItem = ({
             </div>
             <div className = {`${stylesCart.cartProductColumn}`}>
                 <p className = {`${stylesCart.cartProductName}`}>{product.title}</p>
-                <div className = {`${stylesCart.productCardQuntity}`}>
+                <div className = {`${stylesCart.productCardQuantity}`}>
                     <button onClick ={minus} className = {`${stylesCart.productCardButton}`}><Image unoptimized src = {"/minus.svg"} alt = "Кнопка для уменьшения количества товара" fill/></button>
                     <p>{quantity}</p>
                     <button onClick ={plus} className = {`${stylesCart.productCardButton}`}><Image unoptimized src = {"/plus.svg"}  alt = "Кнопка для увеличения количества товара" fill/></button>

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, {useEffect, useRef, useState} from 'react';
 
 import styles from '@/app/css/filters.module.css';
@@ -7,6 +8,7 @@ import { Loader } from '@/app/components/micro/Loader';
 import {useGetCategoriesQuery} from "@/redux/api/categories.api";
 import {useGetProductOnPageQuery} from "@/redux/api/products.api";
 import {useActions} from "@/hooks/useActions";
+import { PriceFilter } from './PriceFilter';
 
 /**
  *
@@ -19,6 +21,8 @@ const Filters = ({setUpdate = f => f, setPageNumber = f => f, filter}) => {
 
     const {isLoading, error, data} = useGetCategoriesQuery();
 
+    console.log(data);
+    console.log(filter)
     switch(filter.type){
         case "drop":
             return(
@@ -35,12 +39,14 @@ const Filters = ({setUpdate = f => f, setPageNumber = f => f, filter}) => {
                     <nav>
                         {
                             (!isLoading) ?
-                                (data && data.data) ?
-                                    <DropFilter key = {`category_${filter.id}_${filter.type}`}
-                                                setUpdate = {setUpdate}
-                                                item = {filter}
-                                                categories = {data.data}
-                                                index = {filter.id}
+                            (data && data.data) ?
+                                    // @ts-ignore
+                                    <DropFilter 
+                                        key = {`category_${filter.id}_${filter.type}`}
+                                        setUpdate = {setUpdate}
+                                        item = {filter}
+                                        categories = {data.data}
+                                        index = {filter.id}
                                     />
                                     : null
                                 : null
@@ -54,38 +60,72 @@ const Filters = ({setUpdate = f => f, setPageNumber = f => f, filter}) => {
                 <section className = {`${styles.filtersBlock}`}>
                     <nav>
                         <DropFilter key = {`category_${filter.id}_${filter.type}`}
-                                        item = {filter}
-                                        index = {filter.id}
-                                        setPageNumber={setPageNumber}
+                            item = {filter}
+                            index = {filter.id}
+                            setPageNumber={setPageNumber}
                         />
                     </nav>
                 </section>
             )
             break;
-        case "oneSelect":
+            case "oneSelect":
+                return(
+                    <section className = {`${styles.filtersBlock}`}>
+                        <nav>
+                            <OneSelectFilter
+                                key = {`category_${filter.id}_${filter.type}`}
+                                item = {filter}
+                                index = {filter.id}
+                            />
+                        </nav>
+                    </section>
+                )
+                break;
+            case "select":
             return(
                 <section className = {`${styles.filtersBlock}`}>
                     <nav>
-                        <OneSelectFilter key = {`category_${filter.id}_${filter.type}`}
-                                        item = {filter}
-                                        index = {filter.id}
+                      <DropFilter key = {`category_${filter.id}_${filter.type}`}
+                        item = {filter}
+                        index = {filter.id}
+                    />
+                    </nav>
+                </section>
+            )
+            break;
+        case "price": {
+            return (
+                <section className={`styles.filtersBlock`}>
+                    <nav>
+                        {
+                            (!isLoading) ?
+                                (data) ?
+                                <RangeFilter 
+                                    key = {`category_${filter.id}_${filter.type}`}
+                                    item = {filter}
+                                    index = {filter.id}
+                                    price={data?.data.flatMap(data => data?.attributes?.products?.data?.map(product => product?.attributes))}
+                                />
+                                    : null
+                                : null
+                        }
+
+                    </nav>
+                </section>
+            )
+        }
+        case "color": {
+            return (
+                <section className={`styles.filtersBlock`}>
+                    <nav>
+                        <DropFilter key = {`category_${filter.id}_${filter.type}`}
+                                    item = {filter}
+                                    index = {filter.id}
                         />
                     </nav>
                 </section>
             )
-            break;
-        case "select":
-            return(
-                <section className = {`${styles.filtersBlock}`}>
-                    <nav>
-                      <SelectFilter key = {`category_${filter.id}_${filter.type}`}
-                                                                    item = {filter}
-                                                                    index = {filter.id}
-                                                                    />
-                    </nav>
-                </section>
-            )
-            break;
+        }
         default:
             return(
                 <section className = {`${styles.filtersBlock}`}>
@@ -217,7 +257,70 @@ const OneSelectFilter = ({item, index, type}) => {
  * @returns {JSX.Element}
  * @constructor
  */
-const RangeFilter = ({item, index, type}) => {
+const RangeFilter = ({item, index, type, price}) => {
+
+
+    
+    const [selectedValues, setSelectedValues] = useState([])
+    const priceData = [];
+    
+    
+    price.map((item, i) => {
+        priceData.push({ price: item.price });
+    });
+
+    const maxPrice = priceData.reduce((max, current) => { 
+        return max > current ? max : current; 
+    }); 
+    
+    const minPrice = priceData.reduce((min, current) => { 
+        return min < current ? min : current; 
+    });
+
+    const expensiveProducts = priceData.filter(product => {
+        product.price <= maxPrice
+    }
+        
+    )
+
+    const cheapProducts = priceData.filter(product => {
+        product.price = minPrice
+    }
+    )
+    
+    // console.log(cheapProdcuts)
+    // console.log(expensiveProducts)
+    // console.log(cheapProducts)
+    
+    const [priceRangeValue, setPriceRangeValue] = useState([minPrice, maxPrice]);
+    
+    console.log(maxPrice);
+    console.log(minPrice);
+    
+    
+    const handlePriceRangeChange = (event, newValue) => {
+        setPriceRangeValue(newValue);
+      };
+    
+      const handleCustomPriceChange = (newValues) => {
+        setPriceRangeValue(newValues);
+      };
+    
+    const handlePriceRange = (value) => {
+        if(selectedValues.includes(value)) {
+            setSelectedValues(selectedValues.filter(item => item!== value))
+        } else {
+            setSelectedValues([...selectedValues, value]);
+        }
+    }
+
+    // <PriceFilter 
+    //     min={minPrice} 
+    //     max={maxPrice} 
+    //     current={priceRangeValue[0]} 
+    //     onPriceChange={handlePriceRangeChange} 
+    // />
+
 
     return(
         <div key = {index} className = {`${styles.filterItem}`}>
@@ -226,12 +329,18 @@ const RangeFilter = ({item, index, type}) => {
 
             <div className={`${styles.sameFilter}}`}>
                 {
-                    item.values.map( (item, index) => {
+                    item.values.map( (value, index) => {
                         return(
-                            <div className={`${styles.rangeRow}`}>
-                                <input type = "checkbox" value={item} className={`${styles.checkItem}`} />
-                                <p className={`${styles.checkValue}`}>{item}</p>
-                            </div>
+                            <div key={index} className={`${styles.rangeRow}`}>
+                             <input
+                                type="range"
+                                value={value}
+                                className={styles.checkItem}
+                                onChange={() => handleCheckbox(value)}
+                                checked={selectedValues.includes(value)}
+                            
+                            />
+                            <p className={selectedValues.includes(value) ? `${styles.checkValue} ${styles.selected}` : styles.checkValue}>{value}</p>                            </div>
                         )
                     })
                 }

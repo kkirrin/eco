@@ -13,6 +13,7 @@ const returnResultProduct = (item) => {
       quantitySales: getAttributeValueAsNumber(item, 'quantitySales'),
       price: getValidPrice(item.attributes.price),
       priceOpt: item.attributes.priceOpt,
+      color: item.attributes.color
   };
 
   console.log(resultProduct);
@@ -23,6 +24,7 @@ const returnResultProduct = (item) => {
 const getItemAttribute = (item, attributeName, defaultValue) => {
   return item.attributes?.[attributeName] || defaultValue;
 }
+
 
 const getItemCategory = (item) => {
   return item.attributes?.categories?.data?.map((category) => category.id) || [];

@@ -115,7 +115,7 @@ export const ProductCard = ({item = {
 /*
        Количество
 
-         <div className = {`${styles.productCardQuntity}`}>
+         <div className = {`${styles.productCardQuantity}`}>
               <button onClick ={minus} className = {`${styles.productCardButton}`}><Image unoptimized src = {"/minus.svg"} alt = "Кнопка для уменьшения количества товара" fill/></button>
               <p>{quantity} </p>
               <button onClick ={plus} className = {`${styles.productCardButton}`}><Image unoptimized src = {"/plus.svg"}  alt = "Кнопка для увеличения количества товара" fill/></button>

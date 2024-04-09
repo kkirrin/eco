@@ -18,6 +18,24 @@ const initialState = [
         values: [
         ]
     },
+    {
+        id: 1,
+        type: 'price',
+        name: 'Фильтр по цене',
+        minvalue: 0,
+        maxvalue: 0,
+        values: [
+        ]
+    },
+    {
+        id: 2,
+        type: 'color',
+        name: 'Фильтр по цвету',
+        minvalue: 0,
+        maxvalue: 0,
+        values: [
+        ]
+    }
 
 ]
 

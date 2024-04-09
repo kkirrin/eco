@@ -33,6 +33,7 @@ const productSlice = createSlice({
                                 quantitySales: Number.parseInt(item.attributes.quantitySales),
                                 price: (!isNaN(Number.parseInt(item.attributes.price)) ? Number.parseInt(item.attributes.price) : 1 ),
                                 optPrice: Number.parseInt(item.attributes.price),
+                                color: item.attributes.color
                             })
                 })
             state.products = tempProducts;

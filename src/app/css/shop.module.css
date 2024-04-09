@@ -286,7 +286,7 @@
     transition: all 0.3s ease-out;
     min-height: 34px;
 }
-.productCardQuntity {
+.productCardQuantity {
     position: relative;
     height: 100%;
     max-height: 100px;
@@ -298,7 +298,7 @@
     border-radius: 30px;
     border: 1px solid rgba(0, 0, 0, 0.40);
 }
-.productCardQuntity p {
+.productCardQuantity p {
     width: 30%;
     border: none;
     display: flex;
@@ -791,7 +791,7 @@
     .shopBlock .productCard:nth-child(n + 3) {
         margin-top: 20px;
     }
-    .productCardQuntity p {
+    .productCardQuantity p {
         width: 30%;
         border: none;
         display: flex;
@@ -994,7 +994,7 @@
     .productCardTitle {
 
     }
-    .addToCartButton, .productCardQuntity p {
+    .addToCartButton, .productCardQuantity p {
         font-size: 16px;
     }
     .productCard .stock p {
