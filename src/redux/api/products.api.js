@@ -40,10 +40,12 @@ export const productsApi = api.injectEndpoints({
 
 function makeStringFilters(filters = []) {
     if(filters[0] != 'undefined') return ''
+    console.log
 
     let tempString = '';
         tempString += `${(params.catId) ? '&filters[categories][id][$contains]=' + params.catId : ''}`;
         tempString += `${(params.volume) ? '&filters[categories][id][$contains]=' + params.catId : ''}`;
+        tempString += `${(params.price) ? '&filters[price][id][$contains]=' + params.price : ''}`;
     return `'}`
 }
 

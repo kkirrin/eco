@@ -24,6 +24,7 @@ const Pagintaion = ({updateFilters, setUpdateFilters = f => f, pageNumber = 1, s
     const [stopRange, setStopRange] = useState(9);
     const [step, setStep] = useState(9);
     const [categoryFilter, setCategoryFilter] = (slug && !filters[0].values[0]) ? useState([slug[0]]) : useState(categories)
+    const [priceFilter, setPriceFilter] = (slug && !filters[1].values[1]) ? useState([slug[1]]) : useState(categories)
 
     let {isLoading, error, data} = useGetProductOnPageQuery({
         page: selectPage,

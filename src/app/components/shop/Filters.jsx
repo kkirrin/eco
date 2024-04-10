@@ -21,6 +21,18 @@ const Filters = ({setUpdate = f => f, setPageNumber = f => f, filter}) => {
 
     const {isLoading, error, data} = useGetCategoriesQuery();
 
+    const colorData = [
+        {color: 'yellow'},
+        {color: 'brown'},
+        {color: 'orange'},
+        {color: 'blue'},
+        {color: 'pink'},
+        {color: 'white'},
+        {color: 'green'},
+        {color: 'black'},
+        {color: 'red'},
+    ]
+
     console.log(data);
     console.log(filter)
     switch(filter.type){
@@ -32,7 +44,7 @@ const Filters = ({setUpdate = f => f, setPageNumber = f => f, filter}) => {
                     </nav>
                 </section>
             )
-            break;
+        break;
         case "category":
             return(
                 <section className = {`${styles.filtersBlock}`}>
@@ -54,7 +66,7 @@ const Filters = ({setUpdate = f => f, setPageNumber = f => f, filter}) => {
                     </nav>
                 </section>
             )
-            break;
+        break;
         case "range":
             return(
                 <section className = {`${styles.filtersBlock}`}>
@@ -67,33 +79,33 @@ const Filters = ({setUpdate = f => f, setPageNumber = f => f, filter}) => {
                     </nav>
                 </section>
             )
-            break;
-            case "oneSelect":
-                return(
-                    <section className = {`${styles.filtersBlock}`}>
-                        <nav>
-                            <OneSelectFilter
-                                key = {`category_${filter.id}_${filter.type}`}
-                                item = {filter}
-                                index = {filter.id}
-                            />
-                        </nav>
-                    </section>
-                )
-                break;
-            case "select":
+        break;
+        case "oneSelect":
             return(
                 <section className = {`${styles.filtersBlock}`}>
                     <nav>
-                      <DropFilter key = {`category_${filter.id}_${filter.type}`}
+                        <OneSelectFilter
+                            key = {`category_${filter.id}_${filter.type}`}
+                            item = {filter}
+                            index = {filter.id}
+                        />
+                    </nav>
+                </section>
+            )
+            break;
+        case "select":
+            return(
+                <section className = {`${styles.filtersBlock}`}>
+                    <nav>
+                    <DropFilter key = {`category_${filter.id}_${filter.type}`}
                         item = {filter}
                         index = {filter.id}
                     />
                     </nav>
                 </section>
             )
-            break;
-        case "price": {
+        break;
+        case "price": 
             return (
                 <section className={`styles.filtersBlock`}>
                     <nav>
@@ -113,14 +125,15 @@ const Filters = ({setUpdate = f => f, setPageNumber = f => f, filter}) => {
                     </nav>
                 </section>
             )
-        }
         case "color": {
             return (
                 <section className={`styles.filtersBlock`}>
                     <nav>
-                        <DropFilter key = {`category_${filter.id}_${filter.type}`}
-                                    item = {filter}
-                                    index = {filter.id}
+                        <SelectColor 
+                            key = {`category_${filter.id}_${filter.type}`}
+                            item = {filter}
+                            index = {filter.id}
+                            colorArray = {colorData}
                         />
                     </nav>
                 </section>
@@ -142,7 +155,9 @@ const Filters = ({setUpdate = f => f, setPageNumber = f => f, filter}) => {
  * @returns {JSX.Element}
  * @constructor
  */
-const DropFilter = ({setUpdate = f => f, item, index, type, categories = []}) => {
+const DropFilter = ({ setUpdate = f => f, item, index, type, categories = [], price = [] }) => {
+
+    const priceData = price.map(item => ({ price: item.price }));
 
     const [valueSelect, setValueSelect] = useState('')
 
@@ -151,9 +166,7 @@ const DropFilter = ({setUpdate = f => f, item, index, type, categories = []}) =>
     const {createFilters} = useActions()
 
     const handleChange = () => {
-        setValueSelect(refSelect.current.value, () => {
-
-        })
+        setValueSelect(refSelect.current.value)
     }
 
     useEffect(() => {
@@ -165,6 +178,8 @@ const DropFilter = ({setUpdate = f => f, item, index, type, categories = []}) =>
         <div key = {index} className = {`${styles.filterItem}`}>
 
             <h4>{item.name}</h4>
+
+            {console.log(item)}
 
         <div className={`${styles.sameFilter}}`}>
                 <select id={`drop_${item.id}`} key = {`key_dropdown_upgrade_${valueSelect}`} ref = {refSelect} onChange = { (evt) => handleChange()} value = {valueSelect}>
@@ -193,7 +208,23 @@ const DropFilter = ({setUpdate = f => f, item, index, type, categories = []}) =>
  * @returns {JSX.Element}
  * @constructor
  */
-const SelectFilter = ({item, index, type}) => {
+const SelectColor = ({item, index, type, colorArray}) => {
+
+    const [valueSelect, setValueSelect] = useState('')
+
+    const refSelect = useRef();
+
+    const {createFilters} = useActions()
+
+    const handleChange = () => {
+        setValueSelect(refSelect.current.value)
+    }
+
+    useEffect(() => {
+        //console.log(valueSelect)
+        createFilters(valueSelect)
+    },[valueSelect])
+    
 
     return(
         <div key = {index} className = {`${styles.filterItem}`}>
@@ -201,17 +232,20 @@ const SelectFilter = ({item, index, type}) => {
             <h4>{item.name}</h4>
 
             <div className={`${styles.sameFilter}}`}>
-                {
-                    item.values.map( (item, index) => {
-                        return(
-                            <div key = {`key_select_filter${index}`} className={`${styles.checkRow}`}>
-                                <input type = "checkbox" value={item} className={`${styles.checkItem}`} />
-                                <p className={`${styles.checkValue}`}>{item}</p>
-                            </div>
-                        )
-                    })
-                }
-            </div>
+                <select className={`${styles.sameFilterColor}`} id={`drop_${item.id}`} key = {`key_dropdown_upgrade_${valueSelect}`} ref = {refSelect} onChange = { (evt) => handleChange()} value = {valueSelect}>
+                    {
+                        (colorArray) ?
+                            colorArray.map( (item) => {
+                                if(item)
+                                    return(
+                                        <option key = {`key_dropdowncat_${item.color}`} value={item.color}>{item.color}</option>
+                                    )
+                            })
+                            : null
+                    }
+                </select>
+
+        </div>
         </div>
     )
 }
@@ -257,97 +291,92 @@ const OneSelectFilter = ({item, index, type}) => {
  * @returns {JSX.Element}
  * @constructor
  */
-const RangeFilter = ({item, index, type, price}) => {
+const RangeFilter = ({ item, index, type, price }) => {
 
+    const [filteredItems, setFilteredItems] = useState([]);
+    const priceArray = price.map(item => item.price);
 
-    
-    const [selectedValues, setSelectedValues] = useState([])
-    const priceData = [];
-    
-    
-    price.map((item, i) => {
-        priceData.push({ price: item.price });
-    });
+    const refSelect = useRef();
 
-    const maxPrice = priceData.reduce((max, current) => { 
-        return max > current ? max : current; 
-    }); 
-    
-    const minPrice = priceData.reduce((min, current) => { 
-        return min < current ? min : current; 
-    });
+    const { createFilters } = useActions();
 
-    const expensiveProducts = priceData.filter(product => {
-        product.price <= maxPrice
+    const [valueSelect, setValueSelect] = useState('')
+    
+    const updateFilteredItems = (minValue, maxValue) => {
+        const newFilteredItems = price.filter((item) => item.price >= minValue && item.price <= maxValue);
+        setFilteredItems(newFilteredItems);
+        console.log(filteredItems);
     }
-        
-    )
+    
+    const minPrice = priceArray.reduce((min, current) => Math.min(min, current), Number.MAX_VALUE);
+    const maxPrice = priceArray.reduce((max, current) => Math.max(max, current), Number.MIN_VALUE);
+    
+    const [minValue, setMinValue] = useState(minPrice);
+    const [maxValue, setMaxValue] = useState(maxPrice);
+    
+    const handleChangeMinValue = (e) => {
+        const updatedValue = parseInt(e.target.value, 10);
+        setMinValue(updatedValue);
+        setValueSelect(refSelect.current.value)
+    };
+    
+    const handleChangeMaxValue = (e) => {
+        const updatedValue = parseInt(e.target.value, 10);
+        setMaxValue(updatedValue);
+        setValueSelect(refSelect.current.value)
+    };
+    
+    useEffect(() => {
+        updateFilteredItems(minValue, maxValue);
+    }, [minValue, maxValue]);
+    
+    useEffect(() => {
+        createFilters(valueSelect)
+    },[valueSelect])
 
-    const cheapProducts = priceData.filter(product => {
-        product.price = minPrice
-    }
-    )
-    
-    // console.log(cheapProdcuts)
-    // console.log(expensiveProducts)
-    // console.log(cheapProducts)
-    
-    const [priceRangeValue, setPriceRangeValue] = useState([minPrice, maxPrice]);
-    
-    console.log(maxPrice);
-    console.log(minPrice);
-    
-    
-    const handlePriceRangeChange = (event, newValue) => {
-        setPriceRangeValue(newValue);
-      };
-    
-      const handleCustomPriceChange = (newValues) => {
-        setPriceRangeValue(newValues);
-      };
-    
-    const handlePriceRange = (value) => {
-        if(selectedValues.includes(value)) {
-            setSelectedValues(selectedValues.filter(item => item!== value))
-        } else {
-            setSelectedValues([...selectedValues, value]);
-        }
-    }
-
-    // <PriceFilter 
-    //     min={minPrice} 
-    //     max={maxPrice} 
-    //     current={priceRangeValue[0]} 
-    //     onPriceChange={handlePriceRangeChange} 
-    // />
-
-
-    return(
-        <div key = {index} className = {`${styles.filterItem}`}>
-
+    return (
+        <div key={index} className={styles.filterItem}>
             <h4>{item.name}</h4>
+            <div className={styles.sameFilter}>
+                <div className={styles.rangeRow}>
+                    <div className={styles.inputRangeWrapper}>
+                        <input
+                            ref={refSelect}
+                            id='minPrice'
+                            type="range"
+                            min={minPrice}
+                            max={maxPrice}
+                            value={minValue}
+                            className={styles.checkItem}
+                            onChange={(e) => handleChangeMinValue(e)}
+                            // id={`drop_${item.id}`} 
+                            key = {`key_dropdown_upgrade_${valueSelect}`}
 
-            <div className={`${styles.sameFilter}}`}>
-                {
-                    item.values.map( (value, index) => {
-                        return(
-                            <div key={index} className={`${styles.rangeRow}`}>
-                             <input
-                                type="range"
-                                value={value}
-                                className={styles.checkItem}
-                                onChange={() => handleCheckbox(value)}
-                                checked={selectedValues.includes(value)}
                             
-                            />
-                            <p className={selectedValues.includes(value) ? `${styles.checkValue} ${styles.selected}` : styles.checkValue}>{value}</p>                            </div>
-                        )
-                    })
-                }
+                        />
+                        <span>{minValue}</span>
+                    </div>
+                    <div className={styles.inputRangeWrapper}>
+                        <input
+                            ref={refSelect}
+                            id='maxPrice'
+                            type="range"
+                            min={minPrice}
+                            max={maxPrice}
+                            value={maxValue}
+                            className={styles.checkItem}
+                            onChange={handleChangeMaxValue}
+                        />
+                        <span>{maxValue}</span>
+                    </div>
+                </div>
             </div>
         </div>
-    )
-}
+    );
+    
+};
+
+
 
 
 export default Filters;
