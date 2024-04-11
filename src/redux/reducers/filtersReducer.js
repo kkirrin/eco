@@ -48,9 +48,14 @@ const filterSlice = createSlice({
             state[0].values = []
             state[0].values.push(action.payload)
         },
-        addFilters: (state, action) => {
-
-        }
+        createFiltersPrice: (state, action) => {
+            state[1].values = []
+            state[1].values.push(action.payload)
+        },
+        createFiltersColor: (state, action) => {
+            state[2].values = []
+            state[2].values.push(action.payload)
+        },
     }
 })
 

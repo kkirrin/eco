@@ -20,6 +20,7 @@ const Filters = ({setUpdate = f => f, setPageNumber = f => f, filter}) => {
 
 
     const {isLoading, error, data} = useGetCategoriesQuery();
+    console.log(data)
 
     const colorData = [
         {color: 'yellow'},
@@ -32,9 +33,6 @@ const Filters = ({setUpdate = f => f, setPageNumber = f => f, filter}) => {
         {color: 'black'},
         {color: 'red'},
     ]
-
-    console.log(data);
-    console.log(filter)
     switch(filter.type){
         case "drop":
             return(
@@ -157,7 +155,6 @@ const Filters = ({setUpdate = f => f, setPageNumber = f => f, filter}) => {
  */
 const DropFilter = ({ setUpdate = f => f, item, index, type, categories = [], price = [] }) => {
 
-    const priceData = price.map(item => ({ price: item.price }));
 
     const [valueSelect, setValueSelect] = useState('')
 
@@ -170,16 +167,14 @@ const DropFilter = ({ setUpdate = f => f, item, index, type, categories = [], pr
     }
 
     useEffect(() => {
-        //console.log(valueSelect)
         createFilters(valueSelect)
+        console.log(valueSelect)
     },[valueSelect])
 
     return(
         <div key = {index} className = {`${styles.filterItem}`}>
 
             <h4>{item.name}</h4>
-
-            {console.log(item)}
 
         <div className={`${styles.sameFilter}}`}>
                 <select id={`drop_${item.id}`} key = {`key_dropdown_upgrade_${valueSelect}`} ref = {refSelect} onChange = { (evt) => handleChange()} value = {valueSelect}>
@@ -214,15 +209,15 @@ const SelectColor = ({item, index, type, colorArray}) => {
 
     const refSelect = useRef();
 
-    const {createFilters} = useActions()
+    const {createFiltersColor} = useActions()
 
     const handleChange = () => {
         setValueSelect(refSelect.current.value)
     }
 
     useEffect(() => {
-        //console.log(valueSelect)
-        createFilters(valueSelect)
+        console.log(valueSelect)
+        createFiltersColor(valueSelect)
     },[valueSelect])
     
 
@@ -291,48 +286,50 @@ const OneSelectFilter = ({item, index, type}) => {
  * @returns {JSX.Element}
  * @constructor
  */
-const RangeFilter = ({ item, index, type, price }) => {
 
+const RangeFilter = ({ item, index, type, price }) => {
     const [filteredItems, setFilteredItems] = useState([]);
     const priceArray = price.map(item => item.price);
 
-    const refSelect = useRef();
+    const minRef = useRef();
+    const maxRef = useRef();
 
-    const { createFilters } = useActions();
+    const { createFiltersPrice } = useActions();
 
-    const [valueSelect, setValueSelect] = useState('')
-    
+    const [valueInput, setValueInput] = useState('');
+
     const updateFilteredItems = (minValue, maxValue) => {
         const newFilteredItems = price.filter((item) => item.price >= minValue && item.price <= maxValue);
         setFilteredItems(newFilteredItems);
         console.log(filteredItems);
     }
-    
+
     const minPrice = priceArray.reduce((min, current) => Math.min(min, current), Number.MAX_VALUE);
     const maxPrice = priceArray.reduce((max, current) => Math.max(max, current), Number.MIN_VALUE);
-    
+
     const [minValue, setMinValue] = useState(minPrice);
     const [maxValue, setMaxValue] = useState(maxPrice);
-    
-    const handleChangeMinValue = (e) => {
-        const updatedValue = parseInt(e.target.value, 10);
+
+    const handleChangeMinValue = () => {
+        const updatedValue = parseInt(minRef.current.value, 10);
         setMinValue(updatedValue);
-        setValueSelect(refSelect.current.value)
+        setValueInput(minRef.current.value);
     };
-    
-    const handleChangeMaxValue = (e) => {
-        const updatedValue = parseInt(e.target.value, 10);
+
+    const handleChangeMaxValue = () => {
+        const updatedValue = parseInt(maxRef.current.value, 10);
         setMaxValue(updatedValue);
-        setValueSelect(refSelect.current.value)
+        setValueInput(maxRef.current.value);
     };
-    
+
     useEffect(() => {
         updateFilteredItems(minValue, maxValue);
     }, [minValue, maxValue]);
-    
+
     useEffect(() => {
-        createFilters(valueSelect)
-    },[valueSelect])
+        createFiltersPrice(valueInput);
+        console.log(valueInput);
+    }, [valueInput]);
 
     return (
         <div key={index} className={styles.filterItem}>
@@ -341,24 +338,21 @@ const RangeFilter = ({ item, index, type, price }) => {
                 <div className={styles.rangeRow}>
                     <div className={styles.inputRangeWrapper}>
                         <input
-                            ref={refSelect}
+                            ref={minRef}
                             id='minPrice'
                             type="range"
                             min={minPrice}
                             max={maxPrice}
                             value={minValue}
                             className={styles.checkItem}
-                            onChange={(e) => handleChangeMinValue(e)}
-                            // id={`drop_${item.id}`} 
-                            key = {`key_dropdown_upgrade_${valueSelect}`}
-
-                            
+                            onChange={handleChangeMinValue}
+                            key={`key_dropdown_upgrade_${valueInput}`}
                         />
                         <span>{minValue}</span>
                     </div>
                     <div className={styles.inputRangeWrapper}>
                         <input
-                            ref={refSelect}
+                            ref={maxRef}
                             id='maxPrice'
                             type="range"
                             min={minPrice}
@@ -366,6 +360,7 @@ const RangeFilter = ({ item, index, type, price }) => {
                             value={maxValue}
                             className={styles.checkItem}
                             onChange={handleChangeMaxValue}
+                            key={`key_dropdown_upgrade_${valueInput}`}
                         />
                         <span>{maxValue}</span>
                     </div>
@@ -373,9 +368,8 @@ const RangeFilter = ({ item, index, type, price }) => {
             </div>
         </div>
     );
-    
-};
 
+};
 
 
 

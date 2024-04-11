@@ -33,6 +33,7 @@ export default function Page({}) {
   const [showFilters, setShowFilters] = useState(false)
   const [pageNubmer, setPageNumber] = useState(1)
   const [categoriesPag, steCategoriesPag] = useState([]);
+  const [price, setPrice] = useState([])
   const {isLoading, error, data } = useGetCategoriesQuery();
 
   const filters = useFilters()
@@ -111,7 +112,7 @@ export default function Page({}) {
             </div>
 
             <div className={stylesShop.shopBlock}>
-              <Pagination  categories={categoriesPag}  pageNumber = {pageNubmer} setPageNumber = {setPageNumber} />
+              <Pagination  categories={categoriesPag}  pageNumber = {pageNubmer} setPageNumber = {setPageNumber} price={price} />
             </div>
           </section>
         </main>
