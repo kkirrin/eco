@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 
 export const useFilters = (select) => {
 
+  // filters приходит из filtersReducer
   const  filters = useSelector(state => state.filters)
   return filters;
 }

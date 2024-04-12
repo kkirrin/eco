@@ -8,56 +8,61 @@ import {createSlice} from "@reduxjs/toolkit";
  *  drop - Выпадающий список
 **/
 
-const initialState = [
-    {
-        id: 0,
-        type: 'category',
-        name: 'Фильтр по категориям',
-        minvalue: 0,
-        maxvalue: 0,
-        values: [
-        ]
-    },
-    {
-        id: 1,
-        type: 'price',
-        name: 'Фильтр по цене',
-        minvalue: 0,
-        maxvalue: 0,
-        values: [
-        ]
-    },
-    {
-        id: 2,
-        type: 'color',
-        name: 'Фильтр по цвету',
-        minvalue: 0,
-        maxvalue: 0,
-        values: [
-        ]
-    }
+const initialState = {
+    filters: [
+        {  
+            id: 0,
+            type: 'category',
+            name: 'Фильтр по категориям',
+            minvalue: 0,
+            maxvalue: 0,
+            values: [
+            ]
+        },
+        {
+            id: 1,
+            type: 'price',
+            name: 'Фильтр по цене',
+            minvalue: 0,
+            maxvalue: 0,
+            values: [
+            ]
+        },
+        {
+            id: 2,
+            type: 'color',
+            name: 'Фильтр по цвету',
+            minvalue: 0,
+            maxvalue: 0,
+            values: [
+            ]
+        }
+    ]
+}
 
-]
-
-
+debugger
 const filterSlice = createSlice({
     name: "filters",
     initialState,
     reducers: {
         createFilters: (state, action) => {
-            state[0].values = []
-            state[0].values.push(action.payload)
+            state.filters[0].values = []
+            state.filters[0].values.push(action.payload)
+            console.log(action.payload);
         },
         createFiltersPrice: (state, action) => {
-            state[1].values = []
-            state[1].values.push(action.payload)
+            state.filters[1].values = []
+            state.filters[1].values.push(action.payload)
+            console.log(action.payload);
+            // сюда приходит значение с файлика под названием Filters.jsx
         },
         createFiltersColor: (state, action) => {
-            state[2].values = []
-            state[2].values.push(action.payload)
+            state.filters[2].values = []
+            state.filters[2].values.push(action.payload)
         },
     }
 })
+debugger
 
 
 export const {reducer, actions} = filterSlice;

@@ -11,28 +11,32 @@ import {useParams} from "next/navigation";
 import {ProductCard} from "@/app/components/shop/ProductCard";
 import {Loader} from "@/app/components/micro/Loader";
 
-const Pagintaion = ({updateFilters, setUpdateFilters = f => f, pageNumber = 1, setPageNumber = f => f, categories = [0]}, price = [0]) => {
+const Pagintaion = ({ updateFilters, setUpdateFilters = f => f, pageNumber = 1, setPageNumber = f => f, categories = [0], price }) => {
 
     const {getDataProducts} = useActions()
 
     const mobile = useMain()
     const {slug} =  useParams()
-    const filters = useFilters()
+    const {filters} = useFilters()
+
+
+    console.log(filters)
 
     const [selectPage, setSelectPage] = useState(pageNumber);
     const [startPage, setStartPage] = useState(1);
     const [stopRange, setStopRange] = useState(9);
     const [step, setStep] = useState(9);
-    const [categoryFilter, setCategoryFilter] = (slug && !filters[0].values[0]) ? useState([slug[0]]) : useState(categories)
-    const [priceFilter, setPriceFilter] = (slug && !filters[1].values[1]) ? useState([slug[1]]) : useState(price)
+    const [categoryFilter, setCategoryFilter] = useState(() => (slug && !filters[0].values[0]) ? [slug[0]] : []);
+    const [priceFilter, setPriceFilter] = useState([]);
 
+    console.log(priceFilter)
+    console.log(categoryFilter)
     let {isLoading, error, data} = useGetProductOnPageQuery({
         page: selectPage,
         catId: false,
         pageSize: 9,
         filters: 
-        (Array.isArray(categoryFilter)) ? categoryFilter : false && (Array.isArray(priceFilter)) ? priceFilter : false
- 
+        {priceFilter, categoryFilter}
         
     });
 
@@ -43,39 +47,50 @@ const Pagintaion = ({updateFilters, setUpdateFilters = f => f, pageNumber = 1, s
     },[selectPage,slug, categoryFilter, priceFilter])
 
     useEffect(() => {
-
         if(!filters[0].values || !filters[0].values[0]) {
             return
         }
-        setCategoryFilter((Array.isArray(filters[0].values)) ? filters[0].values : Array.from(filters[0].values))
-        console.log(filters)
+        if (filters[0].values) {
+            setCategoryFilter(Array.isArray(filters[0].values) ? filters[0].values : [filters[0].values]);
+        }
+        if (filters[1].values) {
+            setPriceFilter([filters[1].values]);
+            console.log(priceFilter)
+        }
         setPageNumber(1)
         setSelectPage(1)
-    },[filters[0].values])
+    },[filters[0].values, filters[1].values])
+
     useEffect(() => {
-
-        if(!filters[0].values || !filters[0].values[0]) {
+        if(filters[1].values || filters[1].values[1]) {
             return
         }
-        setPriceFilter((Array.isArray(filters[1].values)) ? filters[1].values : Array.from(filters[1].values))
-        console.log(filters)
+        setPriceFilter([filters[1].values])
         setPageNumber(1)
         setSelectPage(1)
-    },[filters[1].values])
+    }, [])
 
     useEffect(() => {},[isLoading])
 
     useEffect(() => {
-        if(!filters[0].values) {
-            setCategoryFilter((slug) ? slug[0] : [''])
+        if (filters[1].values && filters[1].values.length === 2) {
+            setPriceFilter([...filters[1].values]);
+            setPageNumber(1);
+            setSelectPage(1);
         }
-    })
-
+    }, [filters[1].values]);
+    
     useEffect(() => {
-        if(!filters[1].values) {
-            setPriceFilter((slug) ? slug[1] : [''])
+        if (filters[0].values) {
+            setCategoryFilter(Array.isArray(filters[0].values) ? filters[0].values : [filters[0].values]);
+            setPageNumber(1);
+            setSelectPage(1);
+        } else if (slug) {
+            setCategoryFilter([slug[0]]);
+            setPageNumber(1);
+            setSelectPage(1);
         }
-    })
+    }, [filters[0].values, slug]);
 
     return(
         <>

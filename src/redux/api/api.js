@@ -20,6 +20,10 @@ import {createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
           },
         }
     ),
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+    refetchOnMountOrArgChange: true,
+
     endpoints: (builder) => ({
       main: builder.query({
         query: () => '/',

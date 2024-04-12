@@ -33,20 +33,24 @@ export default function Page({}) {
   const [showFilters, setShowFilters] = useState(false)
   const [pageNubmer, setPageNumber] = useState(1)
   const [categoriesPag, setCategoriesPag] = useState([]);
+  const [pricePag, setPricePag] = useState([]);
   const {isLoading, error, data } = useGetCategoriesQuery();
 
-  const filters = useFilters()
+  const { filters } = useFilters()
+  console.log(pricePag)
 
   useEffect(() => {
     if (!isLoading) {
       if (data) {
         setCategoriesPag(data.data.filter(item => item.attributes.parent.data == null && item.id == slug).map(item => item.attributes.childs.data.map((item, index) => item.id)))
+
+        setPricePag(data.data.filter(item => item.attributes.parent.data == null && item.id == slug).map(item => item.attributes.childs.data.map((item, index) => item.id)));
       }
     }
   }
   ,[data])
 
-  useEffect(() => {},[categoriesPag])
+  useEffect(() => {},[categoriesPag, pricePag])
 
   return (
       <>
@@ -112,7 +116,7 @@ export default function Page({}) {
             </div>
 
             <div className={stylesShop.shopBlock}>
-              <Pagination  categories={categoriesPag}  pageNumber = {pageNubmer} setPageNumber = {setPageNumber} />
+              <Pagination  categories={categoriesPag}  pageNumber = {pageNubmer} setPageNumber = {setPageNumber} price = {pricePag} />
             </div>
           </section>
         </main>

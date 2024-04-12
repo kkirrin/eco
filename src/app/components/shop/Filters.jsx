@@ -6,7 +6,7 @@ import styles from '@/app/css/filters.module.css';
 import {useFilters, useStater} from '@/hooks/useStater';
 import { Loader } from '@/app/components/micro/Loader';
 import {useGetCategoriesQuery} from "@/redux/api/categories.api";
-import {useGetProductOnPageQuery} from "@/redux/api/products.api";
+import {useGetProductOnPageQuery, useGetProductQuery} from "@/redux/api/products.api";
 import {useActions} from "@/hooks/useActions";
 import { PriceFilter } from './PriceFilter';
 
@@ -20,7 +20,7 @@ const Filters = ({setUpdate = f => f, setPageNumber = f => f, filter}) => {
 
 
     const {isLoading, error, data} = useGetCategoriesQuery();
-    console.log(data)
+    // console.log(data)
 
     const colorData = [
         {color: 'yellow'},
@@ -158,17 +158,19 @@ const DropFilter = ({ setUpdate = f => f, item, index, type, categories = [], pr
 
     const [valueSelect, setValueSelect] = useState('')
 
-    const refSelect = useRef();
+    // const refSelect = useRef();
 
     const {createFilters} = useActions()
 
-    const handleChange = () => {
-        setValueSelect(refSelect.current.value)
-    }
+
+    const handleChange = (e) => {
+        setValueSelect(e.target.value);
+    };
 
     useEffect(() => {
+        debugger
         createFilters(valueSelect)
-        console.log(valueSelect)
+        debugger
     },[valueSelect])
 
     return(
@@ -177,7 +179,7 @@ const DropFilter = ({ setUpdate = f => f, item, index, type, categories = [], pr
             <h4>{item.name}</h4>
 
         <div className={`${styles.sameFilter}}`}>
-                <select id={`drop_${item.id}`} key = {`key_dropdown_upgrade_${valueSelect}`} ref = {refSelect} onChange = { (evt) => handleChange()} value = {valueSelect}>
+                <select id={`drop_${item.id}`} key = {`key_dropdown_upgrade_${valueSelect}`}  onChange={handleChange} value = {valueSelect}>
                     {
                         (categories) ?
                             categories.map( (cat) => {
@@ -227,7 +229,7 @@ const SelectColor = ({item, index, type, colorArray}) => {
             <h4>{item.name}</h4>
 
             <div className={`${styles.sameFilter}}`}>
-                <select className={`${styles.sameFilterColor}`} id={`drop_${item.id}`} key = {`key_dropdown_upgrade_${valueSelect}`} ref = {refSelect} onChange = { (evt) => handleChange()} value = {valueSelect}>
+                <select className={`${styles.sameFilterColor}`} id={`drop_${item.id}`} key = {`key_dropdown_upgrade_${valueSelect}`} ref = {refSelect} onChange={handleChange} value = {valueSelect}>
                     {
                         (colorArray) ?
                             colorArray.map( (item) => {
@@ -288,6 +290,9 @@ const OneSelectFilter = ({item, index, type}) => {
  */
 
 const RangeFilter = ({ item, index, type, price }) => {
+
+    const { refetch } = useGetProductQuery()
+
     const [filteredItems, setFilteredItems] = useState([]);
     const priceArray = price.map(item => item.price);
 
@@ -298,10 +303,10 @@ const RangeFilter = ({ item, index, type, price }) => {
 
     const [valueInput, setValueInput] = useState('');
 
-    const updateFilteredItems = (minValue, maxValue) => {
+    const updateFilteredItems = (minValue, maxValue, valueInput) => {
         const newFilteredItems = price.filter((item) => item.price >= minValue && item.price <= maxValue);
         setFilteredItems(newFilteredItems);
-        console.log(filteredItems);
+        createFiltersPrice(filteredItems);
     }
 
     const minPrice = priceArray.reduce((min, current) => Math.min(min, current), Number.MAX_VALUE);
@@ -323,13 +328,9 @@ const RangeFilter = ({ item, index, type, price }) => {
     };
 
     useEffect(() => {
-        updateFilteredItems(minValue, maxValue);
-    }, [minValue, maxValue]);
+        updateFilteredItems(minValue, maxValue, valueInput);
+    }, [minValue, maxValue, valueInput]);
 
-    useEffect(() => {
-        createFiltersPrice(valueInput);
-        console.log(valueInput);
-    }, [valueInput]);
 
     return (
         <div key={index} className={styles.filterItem}>

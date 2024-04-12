@@ -17,8 +17,6 @@ import {useGetProductOnPageQuery, useGetProductsQuery} from "@/redux/api/product
 import {useStater} from "@/hooks/useStater"
 import BigNavButtons from "@/app/components/BigNavButtons";
 import YouTubeBlock from "@/app/components/YouTubeBlock";
-import Head from "next/head";
-
 
 export default function Home() {
 
