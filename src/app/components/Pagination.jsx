@@ -11,7 +11,7 @@ import {useParams} from "next/navigation";
 import {ProductCard} from "@/app/components/shop/ProductCard";
 import {Loader} from "@/app/components/micro/Loader";
 
-const Pagintaion = ({ updateFilters, setUpdateFilters = f => f, pageNumber = 1, setPageNumber = f => f, categories = [0], price }) => {
+const Pagintaion = ({ updateFilters, setUpdateFilters = f => f, pageNumber = 1, setPageNumber = f => f, categories = [0], price=[] }) => {
 
     const {getDataProducts} = useActions()
 
@@ -29,68 +29,43 @@ const Pagintaion = ({ updateFilters, setUpdateFilters = f => f, pageNumber = 1, 
     const [categoryFilter, setCategoryFilter] = useState(() => (slug && !filters[0].values[0]) ? [slug[0]] : []);
     const [priceFilter, setPriceFilter] = useState([]);
 
-    console.log(priceFilter)
-    console.log(categoryFilter)
     let {isLoading, error, data} = useGetProductOnPageQuery({
         page: selectPage,
         catId: false,
         pageSize: 9,
-        filters: 
-        {priceFilter, categoryFilter}
-        
+        filters: (Array.isArray(categoryFilter)) ? categoryFilter : false
     });
 
     useEffect(() => {
         setStartPage(stopRange)
         setStopRange(step*selectPage)
         setPageNumber(selectPage)
-    },[selectPage,slug, categoryFilter, priceFilter])
+    },[selectPage,slug,categoryFilter])
 
     useEffect(() => {
+        //console.log("Изменение фильтра")
+        //console.log(filters[0].values)
         if(!filters[0].values || !filters[0].values[0]) {
+            //console.log("Фильтр пуст")
             return
         }
-        if (filters[0].values) {
-            setCategoryFilter(Array.isArray(filters[0].values) ? filters[0].values : [filters[0].values]);
-        }
-        if (filters[1].values) {
-            setPriceFilter([filters[1].values]);
-            console.log(priceFilter)
-        }
+        setCategoryFilter((Array.isArray(filters[0].values)) ? filters[0].values : Array.from(filters[0].values))
         setPageNumber(1)
         setSelectPage(1)
-    },[filters[0].values, filters[1].values])
-
-    useEffect(() => {
-        if(filters[1].values || filters[1].values[1]) {
-            return
-        }
-        setPriceFilter([filters[1].values])
-        setPageNumber(1)
-        setSelectPage(1)
-    }, [])
+    },[filters[0].values])
 
     useEffect(() => {},[isLoading])
 
     useEffect(() => {
-        if (filters[1].values && filters[1].values.length === 2) {
-            setPriceFilter([...filters[1].values]);
-            setPageNumber(1);
-            setSelectPage(1);
+        //console.log("RERENDER")
+        //console.log("caT " + categories[0])
+        //console.log("filterS " + filters[0].values)
+        //console.log("RERENDER")
+        if(!filters[0].values) {
+            //console.log((slug) ? slug[0] : "Нет слага")
+            setCategoryFilter((slug) ? slug[0] : [''])
         }
-    }, [filters[1].values]);
-    
-    useEffect(() => {
-        if (filters[0].values) {
-            setCategoryFilter(Array.isArray(filters[0].values) ? filters[0].values : [filters[0].values]);
-            setPageNumber(1);
-            setSelectPage(1);
-        } else if (slug) {
-            setCategoryFilter([slug[0]]);
-            setPageNumber(1);
-            setSelectPage(1);
-        }
-    }, [filters[0].values, slug]);
+    })
 
     return(
         <>
@@ -129,6 +104,9 @@ const Pagintaion = ({ updateFilters, setUpdateFilters = f => f, pageNumber = 1, 
                     (!isLoading) ?
                         (data) ?
                     [...Array(step)].map((item, index) => {
+                        ////console.log(children)
+                        //const nowPage = index + 1 + selectPage ;
+                        //data.meta.pagination.pageCount
                         if(index <= step)
                             return <button
                                     key = {`key_pagination_${index}`}

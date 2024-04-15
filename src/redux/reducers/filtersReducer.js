@@ -40,7 +40,7 @@ const initialState = {
     ]
 }
 
-debugger
+
 const filterSlice = createSlice({
     name: "filters",
     initialState,
@@ -62,7 +62,7 @@ const filterSlice = createSlice({
         },
     }
 })
-debugger
+
 
 
 export const {reducer, actions} = filterSlice;

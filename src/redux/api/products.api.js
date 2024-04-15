@@ -1,5 +1,5 @@
 import {api} from './api'
-debugger
+
 export const productsApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getProducts: builder.query({
@@ -20,7 +20,7 @@ export const productsApi = api.injectEndpoints({
         getProductOnPage: builder.query({
             query: (params = {}) => ({
                 mode: "cors",
-                url: `/products/?populate=*&pagination[page]=${params.page}&pagination[pageSize]=${params.pageSize}${(params.filters[0]) ? `&filters[categories][id][$eq]=${params.filters[0]}` : ''}&filters[price][$eq]=${params.filters[1]}&filters[stock][$notNull]=true&filters[stock][$ne]=0&sort[0]=title:asc`,
+                url: `/products/?populate=*&pagination[page]=${params.page}&pagination[pageSize]=${params.pageSize}${(params.filters[0]) ? `&filters[categories][id][$eq]=${params.filters[0]}` : ''}&filters[stock][$notNull]=true&filters[stock][$ne]=0&sort[0]=title:asc`,
                 method: 'GET',
             }),
         
@@ -28,7 +28,7 @@ export const productsApi = api.injectEndpoints({
         })
 
 })
-debugger
+
 
 
 export const {useGetProductsQuery, useGetProductQuery, useGetProductOnPageQuery} = api;

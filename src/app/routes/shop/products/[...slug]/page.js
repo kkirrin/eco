@@ -18,6 +18,7 @@ import { FeatureProduct } from '@/app/components/shop/FeatureProduct';
 import { TabsProduct } from '@/app/components/shop/TabsProduct';
 import { useActions } from '@/hooks/useActions';
 import { useCustomers, useStater } from '@/hooks/useStater';
+import { CustomView } from '@/app/components/CustomView';
 
 // Стили
 import styles from '@/app/css/mainpage.module.css';
@@ -163,8 +164,21 @@ export default function Home({params}) {
                             </article>
                         </section>
                        : <p style = {{color: 'red',}}>Ошибка получения данных</p>
-             : <Loader />
-      }
+                      : <Loader />
+                }
+
+
+                  <CustomView 
+                    endpoint={'https://'}
+                    settings={{
+                      speed: 200,
+                      rowOfTheElements: 4,  
+                      typeOfTheComponent: 'carusel'   
+                    }}
+                    styles={styles}
+                    data={imgData}
+
+                  />
     </main>
     </>
   )

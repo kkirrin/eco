@@ -17,9 +17,8 @@ import stylesShop from '@/app/css/shop.module.css'
 import Link from "next/link";
 import CategoriesList from "@/app/components/shop/CategoriesList";
 import CategoryName from "@/app/components/shop/CategoryName";
-import Pagination from "@/app/components/Pagination";
 import {useGetCategoriesQuery} from "@/redux/api/categories.api";
-import Pagintaion from '@/app/components/Pagination'
+import Pagination from '@/app/components/Pagination';
 
 export default function Page({}) {
 
@@ -113,7 +112,7 @@ export default function Page({}) {
             </div>
 
             <div className={stylesShop.shopBlock}>
-              <Pagintaion  categories={categoriesPag}  pageNumber = {pageNubmer} setPageNumber = {setPageNumber} price={price} />
+              <Pagination categories={categoriesPag}  pageNumber = {pageNubmer} setPageNumber = {setPageNumber} price={price} />
             </div>
           </section>
         </main>

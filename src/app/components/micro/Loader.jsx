@@ -9,7 +9,6 @@ export const Loader = ({}) => {
     const defaultOptions = {
         loop: true,
         autoplay: true,
-        animationData: animationData,
         renderer: 'svg'
     }
     return (

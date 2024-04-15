@@ -22,6 +22,8 @@ const Filters = ({setUpdate = f => f, setPageNumber = f => f, filter}) => {
     const {isLoading, error, data} = useGetCategoriesQuery();
     // console.log(data)
 
+    console.log(data)
+
     const colorData = [
         {color: 'yellow'},
         {color: 'brown'},
@@ -168,9 +170,9 @@ const DropFilter = ({ setUpdate = f => f, item, index, type, categories = [], pr
     };
 
     useEffect(() => {
-        debugger
+        
         createFilters(valueSelect)
-        debugger
+        
     },[valueSelect])
 
     return(
@@ -295,9 +297,12 @@ const RangeFilter = ({ item, index, type, price }) => {
 
     const [filteredItems, setFilteredItems] = useState([]);
     const priceArray = price.map(item => item.price);
+    console.log(priceArray)
 
     const minRef = useRef();
     const maxRef = useRef();
+
+    console.log(price)
 
     const { createFiltersPrice } = useActions();
 
@@ -306,7 +311,7 @@ const RangeFilter = ({ item, index, type, price }) => {
     const updateFilteredItems = (minValue, maxValue, valueInput) => {
         const newFilteredItems = price.filter((item) => item.price >= minValue && item.price <= maxValue);
         setFilteredItems(newFilteredItems);
-        createFiltersPrice(filteredItems);
+        // createFiltersPrice(filteredItems);
     }
 
     const minPrice = priceArray.reduce((min, current) => Math.min(min, current), Number.MAX_VALUE);
