@@ -173,7 +173,7 @@ export default function Home({params}) {
                     settings={{
                       speed: 200,
                       rowOfTheElements: 4,  
-                      typeOfTheComponent: 'carusel'   
+                      typeOfTheComponent: 'slider'   
                     }}
                     styles={styles}
                     data={imgData}

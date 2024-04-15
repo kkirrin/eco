@@ -20,6 +20,7 @@ const slides = useStater('slides')
   const [sliderSpeed, setSliderSpeed] = useState(3000)
 
   const {isLoading, error, data} = useGetSlidersQuery()
+  console.log(data)
 
   const nextSlide = () => {
     if(!data) return false
