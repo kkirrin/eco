@@ -1,8 +1,6 @@
-import React, {useState, useEffect, use} from "react";
+import React, {useState, useEffect} from "react";
 import Image from 'next/image';
-import { useGetProductQuery } from "@/redux/api/products.api";
 import productStyles from '@/app/css/product.module.css';
-import Link from "next/link";
 
 
 
@@ -15,7 +13,8 @@ export const CustomView = ({
         endpoint, 
         settings = { 
             speed: 0,
-            rowOfTheElements: 4,
+            rows: 4,
+            swiperView: 0,
             typeOfTheComponent: 'slider'|| 'carusel',
             autoplay: true || false
         }, 
@@ -23,29 +22,49 @@ export const CustomView = ({
 
 
     
-    const { speed, rowOfTheElements, typeOfTheComponent } = settings;
-    const [selectedImages, setSelectedImages] = useState(0)
-    // Все слайды
+    const { speed, rows, swiperView, typeOfTheComponent, autoplay } = settings;
+    const [ speedSlider, setSpeedSlider ] = useState(speed)
+    const [selectedImages, setSelectedImages] = useState(0);
     const [ items, setItems] = useState([]);
-    const [touchPosition, setTouchPosition] = useState(null);
-    // Состояние для определения мобила это или нет
     const [ mobile, setMobile ] = useState(null);
-    const [ widthScreen, setWidthScreen ] = useState(0);
-    const [ heightScreen, setHeightScreen ] = useState(0);
     const [selectSlide, setSelectSlide] = useState(0)
+
+    const [ data2, setData ] = useState()
+    const fetchData = async () => {
+        try {
+            const response = await fetch(endpoint, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            if (!response.ok) throw new Error('Проблемы у тебя с интернетом')
+            const data = await response.json();
+            setData(data);
+        } catch (error) {
+            console.log("Ошибка: ", error)
+            throw error
+        }
+    }
+    
+    useEffect(() => {
+        fetchData()
+            .then(data => {
+                console.log('Data:', data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+        });
+    })
 
     useEffect(() => {
         const checkScreenSize = () => {
-            setWidthScreen(window.innerWidth)
-            setHeightScreen(window.innerHeight)
             setMobile(window.innerWidth < 500)
-        
         }
 
         checkScreenSize()
-
         window.addEventListener('resize', checkScreenSize)
-
 
         return () => {
             window.removeEventListener('resize', checkScreenSize);
@@ -70,33 +89,47 @@ export const CustomView = ({
         }
     }
 
+    //Автопроигрывание
     const nextSlide = () => {
         if(!data) return false
         if(selectSlide < data.length - 1) {
-          setSelectSlide(selectSlide + 1);
+            setSelectSlide(selectSlide + 1);
         } else {
-          setSelectSlide(0)
+            setSelectSlide(0);
         }
-      }
-      useEffect(() => {
-          const interval = setInterval(() => {
-            nextSlide()
-          }, speed)
-          return () => clearInterval(interval)
-        }
-      )
+    }
+    
+    useEffect(() => {
+        const interval = setInterval(() => {
+            nextSlide();
+        }, speedSlider);
+    
+        return () => clearInterval(interval);
+    },[autoplay, nextSlide, speedSlider]);
 
+
+
+   // Функция для перехода к следующему элементу в карусели
+    const nextElementCarousel = () => {
+        setSelectedImages((prevIndex) => (prevIndex + 1) % data.length);
+    };
+
+    useEffect(() => {
+        if (autoplay) {
+            const interval = setInterval(nextElementCarousel, speed);
+            return () => clearInterval(interval);
+        }
+    }, [autoplay, selectedImages]);
+        
+      
     useEffect(() => {
         const handleDocumentWheel = (e) => {
             const container = document.querySelector(`.${productStyles.slidersThumbs}`); 
-
             if(container && container.contains(e.target)) {
                 handleWheel(e);
             }
         }
-
         document.addEventListener('wheel', handleDocumentWheel, { passive: false });
-
         return () => {
             document.removeEventListener('wheel', handleDocumentWheel);
         }
@@ -110,8 +143,9 @@ export const CustomView = ({
 
 
     return (
-        <>
-            {typeOfTheComponent === 'slider' && (
+        <>  
+            {/* Каруселька */}
+            {typeOfTheComponent === 'carusel' && (
                 (!data || data.length === 0 ) 
                     ? 
                         <div>
@@ -123,38 +157,34 @@ export const CustomView = ({
                                 (data && Array.isArray(data))
                                     ? 
                                     <>
-                                        <div
-                                            onWheel={(evt) => {
-                                                handleWheel(evt)
-                                            }}
-                                            className = {`${productStyles.sliderThumbs}`}>
-
-                                            
+                                      <div className={`${productStyles.sliderThumbs}`} style={{ overflow: 'auto', display: 'grid', gap: '20px', gridTemplateColumns: `repeat(${rows}, 1fr)` }}>
                                             {
-                                                (data && Array.isArray(data) && data[1]) 
-                                                ?
-                                                
-                                                data.map( (item, index) => {
-                                                    return(
-                                                        <div
-                                                        onClick = { (evt) => {
-                                                            if(!mobile) {
-                                                                console.log('мобилка')
-                                                                setSelectedImages(index)
-                                                            }}
-                                                        }
-                                                        onTouchStart = { (evt) => {
-                                                            setSelectedImages(index)
-                                                        }}
-            
-                                                        className = {`${productStyles.singleProductImg}`}>
-                                                                <Image width={500} height={500} unoptimized src = {`${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_URL_API}${item.attributes.url}`} alt = {item.attributes.alt} />
-                                                            </div>
-                                                        )
-                                                    })
+                                                (data && Array.isArray(data) && data[1]) ? (
+                                                    data.map((item, index) => {
                                                     
-                                                    : null
-                                                }
+                                                        return (
+
+
+
+                                                            <div
+                                                                key={index}
+                                                                onClick={(evt) => {
+                                                                    if (!mobile) {
+                                                                        console.log('мобилка')
+                                                                        setSelectedImages(index)
+                                                                    }
+                                                                }}
+                                                                onTouchStart={(evt) => {
+                                                                    setSelectedImages(index)
+                                                                }}
+                                                                className={`${productStyles.singleProductImg} ${index === selectedImages ? 'active' : ''}`}
+                                                            >
+                                                            <Image unoptimized src = {`${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_URL_API}${item.attributes.url}`} alt = {item.attributes.alt} fill />
+                                                                    </div>
+                                                            )
+                                                        })
+                                                ) : null
+                                            }
                                         </div>
                                     </>
                                     :
@@ -167,59 +197,77 @@ export const CustomView = ({
                                     }
                         </div>
             )}
-
-            {typeOfTheComponent === 'carusel' && (
+            {/* Слайдерок */}
+            {typeOfTheComponent === 'slider' && (
                 (!data || data.length === 0 ) 
                     ? 
                         <div>
                             Загрузка...
                         </div>
                     :                           
-                
-
-                    <section className = {`${styles.sliderContainer}`}>
+                    
+                    <section className = {`${styles.sliderContainerCustom}`}>
                     {
-                      (data) ?
-                          (data.data) ?
-                          data.map( (slide, index) => {
+                        (data && Array.isArray(data)) ?
+                          (data && Array.isArray(data) && data[1]) ? (
+                            data.map((slide, index) => {
                                 return(
                                     <article
-                                        style = {
-                                          (index === 0) ?
-                                              {marginLeft: `-${selectSlide*100}%`}
-                                              : null
-                                        }
-                                        // onMouseMove= {()=>{setSliderSpeed(500000)}}
-                                        // onMouseLeave={()=>{setSliderSpeed(3000)}}
-                                        key = {`slidekey_${index}`}
-                                        className = {`${styles.sliderItem}`}>
-              
-                                      <div className = {`${styles.textSlider}`}>
-                                        <h2>{slide.attributes.header}</h2>
-                                        <p>{slide.attributes.desc}</p>
-              
-                                        <button>
-                                            <Link href = {`${slide.attributes.href}`}>Выбрать в каталоге</Link>
-                                        </button>
-                                      </div>
-              
-              
-                                      <div className = {`${styles.sliderBg}`}>
-                                        <Image unoptimized alt = {slide.attributes.alt} src = {`${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_URL_API}${slide.attributes.src.data.attributes.url}`} fill />
-                                      </div>
-                                    </article>
+                                    style = {
+                                      (index === 0) ?
+                                          {marginLeft: `-${selectSlide*100}%`}
+                                          : null
+                                    }
+                                  
+                                    key = {`slidekey_${index}`}
+                                    className = {`${styles.sliderItem}`}>
+          
+                                <div className = {`${styles.textSlider}`}>
+                                    <h2>{slide.attributes.header}</h2>
+                                    <p>{slide.attributes.desc}</p>
+                                </div>
+          
+          
+                                  <div className = {`${styles.sliderBg}`}>
+                                    <Image unoptimized alt = {slide.attributes.alt} src = {`${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_URL_API}${slide.attributes.url}`} fill />
+                                  </div>
+                                </article>
                                 )
-                              })
-                              : <h3>Слайдеры отсутствуют</h3>
-                          : ''
+                                }))
+                                : <h3>Слайдеры отсутствуют</h3>
+                            : ''
                     }
-              
-                  {/* <SliderController slides = {slides} setSelectSlide = {setSelectSlide}/> */}
-              
-                  </section>
+    
+    
+                        {!autoplay && (
+                            <SliderController
+                                slides={data}
+                                setSelectSlide={setSelectSlide}
+                                styles={styles}
+                            />
+                        )}
+                    </section>
             )}
-                    
-            
         </>
     )
 }
+
+
+const SliderController = ({slides, setSelectSlide = f => f, styles}) => {
+
+    return(
+      <div className = {`${styles.dotContainer}`}>
+      {
+         (slides) ? slides.map ((slide, index) => {
+           if(index > slides.length-2) return;
+            return(
+              <div
+                  onClick = {() => {setSelectSlide(index)}}
+                  key = {`dotKey_${index}`}
+                  className = {`${styles.dot}`}></div>
+            )
+          }) : null
+       }
+      </div>
+    )
+  }

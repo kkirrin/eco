@@ -55,7 +55,7 @@ export default function Home() {
 
       <Slider />
 
-      <Pluses />~
+      <Pluses />
 
       <ProductRow category = {process.env.NEXT_PUBLIC_MOTO_ID} place = "main" />
 

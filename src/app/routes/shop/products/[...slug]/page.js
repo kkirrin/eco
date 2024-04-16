@@ -22,6 +22,7 @@ import { CustomView } from '@/app/components/CustomView';
 
 // Стили
 import styles from '@/app/css/mainpage.module.css';
+import stylesForContainer from '@/app/css/slider.module.css'
 import productStyles from '@/app/css/product.module.css';
 
 // API запросы
@@ -171,11 +172,13 @@ export default function Home({params}) {
                   <CustomView 
                     endpoint={'https://'}
                     settings={{
-                      speed: 200,
-                      rowOfTheElements: 4,  
-                      typeOfTheComponent: 'slider'   
+                      speed: 10000,
+                      swiperView: 4,  
+                      typeOfTheComponent: 'carusel',
+                      autoplay: true,
+                      rows: 4
                     }}
-                    styles={styles}
+                    styles={stylesForContainer}
                     data={imgData}
 
                   />
