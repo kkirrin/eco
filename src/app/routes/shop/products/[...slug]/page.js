@@ -19,6 +19,8 @@ import { TabsProduct } from '@/app/components/shop/TabsProduct';
 import { useActions } from '@/hooks/useActions';
 import { useCustomers, useStater } from '@/hooks/useStater';
 import { CustomView } from '@/app/components/CustomView';
+import Slider from '@/app/components/test/Slider';
+import Carusel from '@/app/components/test/Carusel';
 
 // Стили
 import styles from '@/app/css/mainpage.module.css';
@@ -28,7 +30,6 @@ import productStyles from '@/app/css/product.module.css';
 // API запросы
 import { useGetProductQuery } from "@/redux/api/products.api";
 import returnResultProduct from '@/app/workers/resultProductsWorker';
-
 
 
 ///Вообще тут будет получение товара через fetch а пока так
@@ -104,7 +105,11 @@ export default function Home({params}) {
   },[customer])
 
 
-
+  const images = [
+    'https://via.placeholder.com/800x400/ff5733/fff',
+    'https://via.placeholder.com/800x400/33ff57/fff',
+    'https://via.placeholder.com/800x400/5733ff/fff',
+  ];
 
   return (
     <>
@@ -169,7 +174,7 @@ export default function Home({params}) {
                 }
 
 
-                  <CustomView 
+                  {/* <CustomView 
                     endpoint={['http://localhost:3000/data_img_1.json']}
                     settings={{
                       speed: 2000,
@@ -178,6 +183,32 @@ export default function Home({params}) {
                       rows: 0
                     }}
                     styles={stylesForContainer}
+                  /> */}
+
+
+                  {/* ЧИСТЫЙ НОВЫЙ СЛАЙДЕР */}
+
+                  
+                  <Carusel 
+                    endpoint={[`http://localhost:3000/data_img_1.json`]}
+                    settings={{
+                      speed: 10000,
+                      rows: 2,
+                      autoplay: true,
+                    }} 
+                    images={images}
+                    styles={styles}
+                    
+                  />
+                  <Slider 
+                    endpoint={[`http://localhost:3000/data_img_1.json`, `http://localhost:3000/data_img_1.json`]}
+                    settings={{
+                      speed: 3000,
+                      rows: 2,
+                      autoplay: true,
+                    }} 
+                    styles={styles}
+                    
                   />
     </main>
     </>
