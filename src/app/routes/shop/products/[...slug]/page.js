@@ -170,17 +170,14 @@ export default function Home({params}) {
 
 
                   <CustomView 
-                    endpoint={'https://'}
+                    endpoint={['http://localhost:3000/data_img_1.json']}
                     settings={{
-                      speed: 10000,
-                      swiperView: 4,  
-                      typeOfTheComponent: 'carusel',
+                      speed: 2000,
+                      typeOfTheComponent: 'slider',
                       autoplay: true,
-                      rows: 4
+                      rows: 0
                     }}
                     styles={stylesForContainer}
-                    data={imgData}
-
                   />
     </main>
     </>

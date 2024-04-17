@@ -109,6 +109,39 @@
     overflow: hidden;
     background-color: #fff;
 }
+.sliderThumbsCustom {
+    width: 90%;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+    padding-bottom: 20px;
+    padding-left: 3%;
+}
+.sliderThumbsCustom .singleProductImg {
+    position: relative;
+    min-width: 350px !important;
+    height: 350px !important;
+    overflow: hidden  !important;;
+    background-color: #fff;
+    cursor: pointer;
+}
+.sliderThumbsCustom .singleProductImg img {
+    border-radius: 10px !important;
+}
+.sliderThumbsCustom .singleProductImg:first-child {
+    margin-left: 2% !important;
+}
+*:not(.sliderThumbsCustom) .singleProductImg {
+    position: relative;
+    width: 100% !important;
+    height: 28vw;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #fff;
+}
 .singleProductImg img {
     object-fit: contain;
     width: 87% !important;
@@ -453,6 +486,28 @@
         padding-bottom: 20px;
         padding-left: 6%;
     }
+    .sliderThumbsCustom .singleProductImg {
+        position: relative;
+        min-width: 108px !important;
+        height: 80px !important;
+        overflow: hidden !important;
+        background-color: #fff;
+    }
+    .sliderThumbsCustom.singleProductImg img {
+        border-radius: 10px !important;
+        width: 100% !important;
+    }
+    .sliderThumbsCustom {
+        width: 87%;
+        overflow-x: scroll;
+        overflow-y: hidden;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        scrollbar-width: thin;
+        padding-bottom: 20px;
+        padding-left: 6%;
+    }
     .singleProduct > :nth-child(3) {
         width: 100%;
     }
@@ -465,6 +520,17 @@
         background-color: #fff;
     }
     .sliderThumbs .singleProductImg:first-child {
+        margin-left: 0 !important;
+    }
+    :not(.sliderThumbsCustom) .singleProductImg {
+        position: relative;
+        width: 100% !important;
+        height: 284px;
+        border-radius: 10px;
+        overflow: hidden;
+        background-color: #fff;
+    }
+    .sliderThumbsCustom .singleProductImg:first-child {
         margin-left: 0 !important;
     }
     .singleProduct {

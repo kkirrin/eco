@@ -9,8 +9,7 @@ import productStyles from '@/app/css/product.module.css';
 // settings - скорость, число элементов в строке, есть ли автопроигрывание, отображение
 // Последнее - файл со стилями для основного контейнера
 export const CustomView = ({
-        data, 
-        endpoint, 
+        endpoint=[], 
         settings = { 
             speed: 0,
             rows: 4,
@@ -25,38 +24,44 @@ export const CustomView = ({
     const { speed, rows, swiperView, typeOfTheComponent, autoplay } = settings;
     const [ speedSlider, setSpeedSlider ] = useState(speed)
     const [selectedImages, setSelectedImages] = useState(0);
-    const [ items, setItems] = useState([]);
     const [ mobile, setMobile ] = useState(null);
     const [selectSlide, setSelectSlide] = useState(0)
+    const [selectImage, setSelectImage] = useState(0)
+    
+    const [ data, setData ] = useState([])
 
-    const [ data2, setData ] = useState()
     const fetchData = async () => {
-        try {
-            const response = await fetch(endpoint, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+        if (endpoint && endpoint.length > 0) {
+            try {
+                const newData = [];
+                for (const endpointItem of endpoint) {
+                    const response = await fetch(endpointItem, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    });
+                    if (!response.ok) throw new Error('Проблемы у тебя с интернетом');
+                    const object = await response.json();
+                    newData.push(object.data);
                 }
-            })
-            if (!response.ok) throw new Error('Проблемы у тебя с интернетом')
-            const data = await response.json();
-            setData(data);
-        } catch (error) {
-            console.log("Ошибка: ", error)
-            throw error
+               
+                setData(newData);
+            } catch (error) {
+                console.log("Ошибка: ", error);
+                throw error;
+            }
         }
-    }
+    };
+    
     
     useEffect(() => {
         fetchData()
-            .then(data => {
-                console.log('Data:', data);
-            })
             .catch(error => {
                 console.error('Error:', error);
         });
-    })
+    },[])
 
     useEffect(() => {
         const checkScreenSize = () => {
@@ -70,24 +75,6 @@ export const CustomView = ({
             window.removeEventListener('resize', checkScreenSize);
         };
     }, []); 
-
-    // Заполнение items
-    useEffect(() => {
-        setItems(data[0])
-    }, []);
-
-
-    // Функция для прокрутки
-    const handleWheel = (e) => {
-        const container = e.currentTarget;
-        const isInContainer = container.contains(e.target);
-
-        if(isInContainer) {
-            e.preventDefault()
-            const scrollAmount = e.deltaY < 0 ? -speed : speed;
-            container.scrollLeft += scrollAmount;
-        }
-    }
 
     //Автопроигрывание
     const nextSlide = () => {
@@ -106,86 +93,120 @@ export const CustomView = ({
     
         return () => clearInterval(interval);
     },[autoplay, nextSlide, speedSlider]);
+      
 
+    const nextImageCarusel = () => {
+        if (!data) return false;
 
-
-   // Функция для перехода к следующему элементу в карусели
-    const nextElementCarousel = () => {
-        setSelectedImages((prevIndex) => (prevIndex + 1) % data.length);
+        if (selectImage < data.length - 1) {
+            setSelectImage(selectImage + 1);
+        } else {
+            setSelectImage(0);
+        }
     };
 
     useEffect(() => {
-        if (autoplay) {
-            const interval = setInterval(nextElementCarousel, speed);
-            return () => clearInterval(interval);
-        }
-    }, [autoplay, selectedImages]);
-        
-      
-    useEffect(() => {
-        const handleDocumentWheel = (e) => {
-            const container = document.querySelector(`.${productStyles.slidersThumbs}`); 
-            if(container && container.contains(e.target)) {
-                handleWheel(e);
+        const interval = setInterval(() => {
+            nextImageCarusel();
+        }, speedSlider);
+
+        return () => clearInterval(interval);
+    }, []);
+
+   // Функция для перехода к следующему элементу в карусели
+   
+
+   let currentIndex = 0;
+
+   // Определяем функции prevImage и nextImage вне обработчика
+//    const prevImage = (imagesIntoCarusel) => {
+//         console.log(imagesIntoCarusel)
+//        currentIndex = (currentIndex - 1 + imagesIntoCarusel.length) % imagesIntoCarusel.length;
+//        console.log(currentIndex);
+//    };
+   
+//    const nextImage = (imagesIntoCarusel) => {
+//     console.log(imagesIntoCarusel)
+//        currentIndex = (currentIndex + 1) % imagesIntoCarusel.length;
+//        console.log(currentIndex);
+//    };
+   
+   // Обработчик клика
+   const handleCaruselClick = (e, index) => {
+        const container = e.currentTarget.parentNode.parentNode.id;
+        const currentImage = index
+        console.log(currentImage);
+
+        if (data[container]) {
+            console.log(data[container])
+            const imagesIntoCarusel = data[container].map(array => array.length);
+            if(currentIndex >= imagesIntoCarusel)  {
+                nextImageCarusel()
             }
-        }
-        document.addEventListener('wheel', handleDocumentWheel, { passive: false });
-        return () => {
-            document.removeEventListener('wheel', handleDocumentWheel);
-        }
-    }, [])
+        } 
+  
 
-    useEffect(() => {
-
-    },[selectedImages])
-
-    
+  };
 
 
     return (
         <>  
             {/* Каруселька */}
             {typeOfTheComponent === 'carusel' && (
-                (!data || data.length === 0 ) 
+                (!data) 
                     ? 
                         <div>
                             Загрузка...
                         </div>
                     : 
-                        <div>
+                    <div>
                             {
-                                (data && Array.isArray(data))
+                                (data && Array.isArray(data) && data.length > 0)
                                     ? 
                                     <>
-                                      <div className={`${productStyles.sliderThumbs}`} style={{ overflow: 'auto', display: 'grid', gap: '20px', gridTemplateColumns: `repeat(${rows}, 1fr)` }}>
-                                            {
-                                                (data && Array.isArray(data) && data[1]) ? (
-                                                    data.map((item, index) => {
-                                                    
-                                                        return (
-
-
-
-                                                            <div
-                                                                key={index}
-                                                                onClick={(evt) => {
-                                                                    if (!mobile) {
-                                                                        console.log('мобилка')
+                                    {/* Сначала достал каждый массив */}
+                                    {data.map((array, arrayIndex) => (
+                                        <React.Fragment key={arrayIndex}>
+                                            {/* А потом уже взял элементы из массива */}
+                                            <div 
+                                                key={arrayIndex}
+                                                id={`${arrayIndex}`}
+                                                className={`${productStyles.sliderThumbsCustom}`} 
+                                                style={{gap: '20px', overflow: 'auto', ...(rows ? { display: 'grid', gridTemplateRows: `repeat(${rows}, 1fr)` } : {}) }}
+                                                // onClick={() => {console.log(arrayIndex)}}
+                                                >
+                                                    {array.map((item, index) => (
+                                                        <div 
+                                                            key={index}>
+                                                                <div
+                                                                    key={index}
+                                                                    onClick={(evt) => {
+                                                                      
+                                                                            setSelectedImages(index)
+                                                                            handleCaruselClick(evt, index)
+                                                                     
+                                                                    }}
+                                                                    style={{
+                                                                        marginLeft: `-${selectImage * 100}%`,
+                                                                      }}
+                                                                    onTouchStart={(evt) => {
                                                                         setSelectedImages(index)
-                                                                    }
-                                                                }}
-                                                                onTouchStart={(evt) => {
-                                                                    setSelectedImages(index)
-                                                                }}
-                                                                className={`${productStyles.singleProductImg} ${index === selectedImages ? 'active' : ''}`}
-                                                            >
-                                                            <Image unoptimized src = {`${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_URL_API}${item.attributes.url}`} alt = {item.attributes.alt} fill />
-                                                                    </div>
-                                                            )
-                                                        })
-                                                ) : null
-                                            }
-                                        </div>
+                                                                    }}
+                                                                    className={`${productStyles.singleProductImg} ${index === selectedImages ? 'active' : ''}`}
+                                                                >
+                                                                    <Image  
+                                                                        unoptimized 
+                                                                        src={item.img} 
+                                                                        alt={item.description} 
+                                                                        fill 
+                                                                    />
+
+                                                                </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                        </React.Fragment>
+                                    ))}
                                     </>
                                     :
                                     <>
@@ -194,51 +215,57 @@ export const CustomView = ({
                                         </div>
 
                                     </>
-                                    }
+                                }
                         </div>
             )}
             {/* Слайдерок */}
             {typeOfTheComponent === 'slider' && (
-                (!data || data.length === 0 ) 
+                (!data) 
                     ? 
                         <div>
                             Загрузка...
                         </div>
                     :                           
-                    
-                    <section className = {`${styles.sliderContainerCustom}`}>
-                    {
-                        (data && Array.isArray(data)) ?
-                          (data && Array.isArray(data) && data[1]) ? (
-                            data.map((slide, index) => {
-                                return(
-                                    <article
-                                    style = {
-                                      (index === 0) ?
-                                          {marginLeft: `-${selectSlide*100}%`}
-                                          : null
-                                    }
-                                  
-                                    key = {`slidekey_${index}`}
-                                    className = {`${styles.sliderItem}`}>
-          
-                                <div className = {`${styles.textSlider}`}>
-                                    <h2>{slide.attributes.header}</h2>
-                                    <p>{slide.attributes.desc}</p>
-                                </div>
-          
-          
-                                  <div className = {`${styles.sliderBg}`}>
-                                    <Image unoptimized alt = {slide.attributes.alt} src = {`${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_URL_API}${slide.attributes.url}`} fill />
-                                  </div>
-                                </article>
-                                )
-                                }))
-                                : <h3>Слайдеры отсутствуют</h3>
-                            : ''
-                    }
-    
-    
+                    <>
+                        {data.length > 0 ? (
+                            data.map((array, arrayIndex) => (
+                            <React.Fragment key={arrayIndex}>
+                                {array.length > 0 ? (
+                                    <section key={`slide_${arrayIndex}`} className={`${styles.sliderContainerCustom}`}>
+                                    {array.map((slide, index) => (
+                                        <article
+                                            style = {
+                                                (index === 0) ?
+                                                    {marginLeft: `-${selectSlide*100}%`}
+                                                    : null
+                                            }
+                                            key={`slide_${index}`}
+                                            className={styles.sliderItem}
+                                        >
+                                            <div className={styles.textSlider}>
+                                                <h2>{slide.description}</h2>
+                                                <p>{slide.description}</p>
+                                            </div>
+                                            <div className={styles.sliderBg}>
+                                                
+                                                <Image
+                                                    unoptimized
+                                                    alt={slide.description}
+                                                    src={slide.img}
+                                                    fill
+                                                />
+                                            </div>
+                                        </article>
+                                ))}
+                                    </section>
+                                ) : (
+                                <h3>Слайдеры отсутствуют</h3>
+                                )}
+                            </React.Fragment>
+                            ))
+                        ) : (
+                            ''
+                        )}
                         {!autoplay && (
                             <SliderController
                                 slides={data}
@@ -246,28 +273,29 @@ export const CustomView = ({
                                 styles={styles}
                             />
                         )}
-                    </section>
+                    </>
             )}
         </>
     )
 }
 
 
-const SliderController = ({slides, setSelectSlide = f => f, styles}) => {
-
-    return(
-      <div className = {`${styles.dotContainer}`}>
-      {
-         (slides) ? slides.map ((slide, index) => {
-           if(index > slides.length-2) return;
-            return(
-              <div
-                  onClick = {() => {setSelectSlide(index)}}
-                  key = {`dotKey_${index}`}
-                  className = {`${styles.dot}`}></div>
-            )
-          }) : null
-       }
-      </div>
-    )
-  }
+// const SliderController = ({slides, setSelectSlide = f => f, styles}) => {
+//     console.log(slides)
+//     return(
+//       <div className = {`${styles.dotContainer}`}>
+//       {
+//          (slides) ? slides.map ((slide, index) => {
+//            if(index > slides.length-2) return;
+//             return(
+//               <div
+//                   onClick = {() => {setSelectSlide(index)}}
+//                   key = {`dotKey_${index}`}
+//                   className = {`${styles.dot}`}></div>
+//             )
+//           }) : null
+//        }
+//       </div>
+//     )
+//   }
+  

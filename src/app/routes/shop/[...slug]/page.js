@@ -20,7 +20,11 @@ import CategoryName from "@/app/components/shop/CategoryName";
 import Pagination from "@/app/components/Pagination";
 import {useGetCategoriesQuery} from "@/redux/api/categories.api";
 
+
+import Carousel from '@/app/components/Carusel'
+
 export default function Page({}) {
+  
 
   const router = useRouter();
   const {slug} =  useParams()
@@ -35,6 +39,16 @@ export default function Page({}) {
   const [categoriesPag, setCategoriesPag] = useState([]);
   const [pricePag, setPricePag] = useState([]);
   const {isLoading, error, data } = useGetCategoriesQuery();
+
+
+  const images = [
+    'https://via.placeholder.com/800x400/ff5733/fff',
+    'https://via.placeholder.com/800x400/33ff57/fff',
+    'https://via.placeholder.com/800x400/5733ff/fff',
+  ];
+
+
+  
 
   const { filters } = useFilters()
   console.log(pricePag)
@@ -55,6 +69,12 @@ export default function Page({}) {
   return (
       <>
         <main className={`${styles.main} ${stylesShop.shopPage}`}>
+
+
+        <Carousel images={images} />
+
+
+
             {
               <CategoryName id = {(slug[0]) ? slug[0] : "Магазин"} />
             }

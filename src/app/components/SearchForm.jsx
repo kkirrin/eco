@@ -45,6 +45,7 @@ export const SearchForm = ({}) => {
                 }
             })
             const result = await fetchSearch.json();
+            console.log(result);
 
             if(await result) {
                 if(text) {
