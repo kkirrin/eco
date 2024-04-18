@@ -1,5 +1,5 @@
 
-.carusel {
+.carusel2 {
   overflow: hidden;
   position: relative;
 }
@@ -8,6 +8,7 @@
   display: flex;
   flex-wrap: wrap;
 }
+
 
 .carusel__frame {
   display: flex;

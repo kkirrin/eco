@@ -29,12 +29,14 @@ const Slider = ({
       styles,}) => {
 
     const { speed, rows, swiperView, typeOfTheComponent, autoplay } = settings;
+    const [ speedSlider, setSpeedSlider ] = useState(speed)
+    const [selectSlide, setSelectSlide] = useState(0)
     const [ data, setData ] = useState([])
     const [activeIndex, setActiveIndex] = useState(0);
     
 
 
-    // Получаем данные
+  // Получаем данные
     const fetchData = async () => {
       if (endpoint && endpoint.length > 0) {
           try {
@@ -51,34 +53,41 @@ const Slider = ({
                   const object = await response.json();
                   newData.push(object.data);
               }
-             
+              
               setData(newData);
           } catch (error) {
               console.log("Ошибка: ", error);
               throw error;
           }
       }
-  };
-
-  console.log(data)
-
-  const arrayImageFromData = data.flatMap(innerArray => innerArray.map(item => item.img));
-  console.log(arrayImageFromData)
-  
-  useEffect(() => {
-      fetchData()
-          .catch(error => {
-              console.error('Error:', error);
-      });
-  },[])
-
-  useEffect(() => {
-    const autoPlayInterval = setInterval(nextSlide, speed);
-    return () => {
-      clearInterval(autoPlayInterval);
     };
-  }, [speed]);
 
+    const arrayImageFromData = data.flatMap(innerArray => innerArray.map(item => item.img));
+    // Получаем данные
+    useEffect(() => {
+        fetchData()
+            .catch(error => {
+                console.error('Error:', error);
+        });
+    },[])
+
+    //Автопроигрывание
+    useEffect(() => {
+      console.log(activeIndex)
+      if(activeIndex < arrayImageFromData.length - 1) {
+        const autoPlayInterval = setInterval(nextSlide, speed);
+
+      return () => {
+        clearInterval(autoPlayInterval);
+      };
+
+      } else {
+        setActiveIndex(0)
+      }
+    }, [speed]);
+
+
+    // ПЕРЕКЛЮЧЕНИЕ ПО КНОПКАМ
     const nextSlide = () => {
       setActiveIndex((prevIndex) =>
         prevIndex === arrayImageFromData.length - 1 ? 0 : prevIndex + 1
@@ -89,8 +98,11 @@ const Slider = ({
         prevIndex === 0 ? arrayImageFromData.length - 1 : prevIndex - 1
       );
     };
+
+
+
     return (
-      <div className={SliderStyles.carusel} style={{ transition: 'transform 0.6s ease-in-out'}}>
+      <div className={styles.carusel} style={{overflow: 'hidden', transition: 'transform 0.6s ease-in-out'}}>
         <button onClick={prevSlide} className="carousel__btn carousel__btn--prev">
           &lt;
         </button>

@@ -30,6 +30,7 @@ import productStyles from '@/app/css/product.module.css';
 // API запросы
 import { useGetProductQuery } from "@/redux/api/products.api";
 import returnResultProduct from '@/app/workers/resultProductsWorker';
+import { CommonCustomView } from '@/app/components/test/CommonCustomView';
 
 
 ///Вообще тут будет получение товара через fetch а пока так
@@ -188,27 +189,15 @@ export default function Home({params}) {
 
                   {/* ЧИСТЫЙ НОВЫЙ СЛАЙДЕР */}
 
-                  
-                  <Carusel 
-                    endpoint={[`http://localhost:3000/data_img_1.json`]}
+                  <CommonCustomView
+                    endpoint={[`http://localhost:3000/data_img_1.json`, `http://localhost:3000/data_img_2.json` ]}
                     settings={{
-                      speed: 10000,
+                      speed: 15000,
                       rows: 2,
                       autoplay: true,
-                    }} 
-                    images={images}
+                      typeOfTheComponent:'carusel',
+                    }}
                     styles={styles}
-                    
-                  />
-                  <Slider 
-                    endpoint={[`http://localhost:3000/data_img_1.json`, `http://localhost:3000/data_img_1.json`]}
-                    settings={{
-                      speed: 3000,
-                      rows: 2,
-                      autoplay: true,
-                    }} 
-                    styles={styles}
-                    
                   />
     </main>
     </>

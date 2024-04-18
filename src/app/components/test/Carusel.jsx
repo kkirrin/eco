@@ -17,6 +17,7 @@ const Carusel = ({
     const [ data, setData ] = useState([])
 
     const [slideIndex, setSlideIndex] = useState(0);
+    const [selectedImages, setSelectedImages] = useState(0);
     const slideWidth = 100 / 6;
 
    
@@ -66,6 +67,8 @@ const Carusel = ({
       });
   },[])
 
+  
+
   useEffect(() => {
     const intervalId = setInterval(() => {
       setSlideIndex(prevIndex => (prevIndex + 1) % lengthArrayImageFromData);
@@ -81,7 +84,13 @@ const Carusel = ({
       <div className={StyleCarusel.slider}>
         <div className={StyleCarusel.slides__container} style={{ display: "flex", gap: "20px", transition: 'transform 0.6s ease-in-out', transform: `translateX(-${slideIndex * slideWidth}%)` }}>
             {extendedImages.map((image, index) => (
-              <div className={StyleCarusel.slide} key={index}>
+              <div 
+                className={StyleCarusel.slide} 
+                key={index}  
+                onTouchStart={(evt) => {
+                  setSelectedImages(index)
+                }}
+            >
                 <img 
                   style={{ 
                     maxWidth: "250px", 

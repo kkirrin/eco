@@ -11,8 +11,31 @@
 .slide {
   flex: 0 0 auto;
 }
+.slide__img {
+    max-width: 250px;
+    height: 250px;
+    object-fit:cover;
+    width: auto;
+    border-radius: 20px;
+}
 
-button {
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+.btn__prev, .btn__next {
+  border-radius: 100%;
+  background-color: antiquewhite;
+  padding: 10px;
+  transition: 0.5s all ease-in-out;
+}
+.btn__prev:hover, .btn__next:hover {
+  scale: 1.1;
+}
+
+.button {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
