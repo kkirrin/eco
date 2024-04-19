@@ -190,7 +190,10 @@ export default function Home({params}) {
                   {/* ЧИСТЫЙ НОВЫЙ СЛАЙДЕР */}
 
                   <CommonCustomView
-                    endpoint={[`http://localhost:3000/data_img_1.json`, `http://localhost:3000/data_img_2.json` ]}
+                    endpoint={[
+                      [`http://localhost:3000/data_img_1.json` ],
+                      [`http://localhost:3000/data_img_1.json`, `http://localhost:3000/data_img_2.json` ]
+                    ]}
                     settings={{
                       speed: 15000,
                       rows: 2,
