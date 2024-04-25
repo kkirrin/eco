@@ -14,14 +14,10 @@ export const CommonCustomView = ({
         autoplay: true || false
     },
     styles
-}) => {
+    }) => {
     const { speed, rows, swiperView, typeOfTheComponent, autoplay} = settings;
     const [ data, setData ] = useState([])
-
-    const [ slideIndex, setSlideIndex ] = useState(0)
-    const [ selectedImages, setSelectedImages ] = useState(0)
     const [scrollSpeed,] = useState(200)
-    const [activeIndex, setActiveIndex] = useState(0);
 
     const [ mobile, setMobile ] = useState(null);
 
@@ -56,7 +52,7 @@ export const CommonCustomView = ({
                     const object = await response.json();
                     newData.push(object.data);
                 } catch (error) {
-                    console.log("Ошибка: ", error);
+                    // console.log("Ошибка: ", error);
                     throw error;
                 }
             }
@@ -75,7 +71,7 @@ export const CommonCustomView = ({
                 const object = await response.json();
                 setData([object.data]); // Сохраняем результат в массиве
             } catch (error) {
-                console.log("Ошибка: ", error);
+                // console.log("Ошибка: ", error);
                 throw error;
             }
         }
@@ -83,9 +79,6 @@ export const CommonCustomView = ({
 
     // Массив с картинками
     const arrayImageFromData = data.flatMap(innerArray => innerArray.map(item => item.img));
-
-    // Массив для заполнения пустого пространства
-    const extendedImages = [...arrayImageFromData, ...arrayImageFromData, ...arrayImageFromData];
     
     const newArray = []
 
@@ -109,7 +102,7 @@ export const CommonCustomView = ({
             onlyImgs.push(arrayImageFromData)
             // console.log(arrayImageFromData)
         } else {
-            console.log("Ошибка");
+            // console.log("Ошибка");
         }
     }
     const onlyImgsRepeatMain = []
@@ -123,65 +116,14 @@ export const CommonCustomView = ({
         }
     }
 
+
+    const onlyImgsRepeatMainSingle = onlyImgsRepeatMain.reduce((acc, array) => {
+        return [...acc, ...array]
+    }, [])
+
+
     const lengthArrayImageFromData = arrayImageFromData.length
 
-
-    // Функция для кнопки carusel вправо
-    const handlePrevClick = () => {
-        setSlideIndex(prevIndex => (prevIndex - 1 + lengthArrayImageFromData) % lengthArrayImageFromData);
-    };
-
-    // Функция для кнопки carusel влево
-    const handleNextClick = (e, index) => {
-        setSlideIndex(prevIndex => (prevIndex + 1) % lengthArrayImageFromData);
-    };
-
-    // Функция для кнопки slider вправо
-    const nextSlide = () => {
-        setActiveIndex((prevIndex) =>
-          prevIndex === arrayImageFromData.length - 1 ? 0 : prevIndex + 1
-        );
-    };
-
-    // Функция для кнопки slider влево
-    const prevSlide = () => {
-        setActiveIndex(prevIndex => {
-            // Если текущий индекс - 1, переходим к последнему слайду
-            if (prevIndex === 0) {
-                return arrayImageFromData.length - 1;
-            } else {
-                // В противном случае, просто переходим к предыдущему слайду
-                return prevIndex - 1;
-            }
-        });
-    };
-
-    // Автоплэй для капусели
-    useEffect(() => {
-        if(autoplay) {
-            const intervalId = setInterval(() => {
-                setSlideIndex(prevIndex => (prevIndex + 1) % lengthArrayImageFromData);
-            }, speed); 
-            
-            return () => clearInterval(intervalId);
-        }
-      }, [autoplay, lengthArrayImageFromData, speed]);
-
-    // Автоплэй для слайдера
-    useEffect(() => {
-        if(autoplay) {
-            if(activeIndex < lengthArrayImageFromData - 1) {
-                const autoPlayInterval = setInterval(nextSlide, speed)
-                return () => {
-                    clearInterval(autoPlayInterval)
-                }
-            } else {
-                setActiveIndex(0)
-            }
-        }
-    }, [autoplay, lengthArrayImageFromData, speed, activeIndex, nextSlide])
-
-  
     // Слушает изменение размеров
     useEffect(() => {
         const checkScreenSize = () => {
@@ -218,7 +160,7 @@ export const CommonCustomView = ({
     useEffect(()=> {
         fetchData()
             .catch(error => { 
-                console.log("Ошибка: ", error)
+                // console.log("Ошибка: ", error)
             })
     },[])
 
@@ -249,66 +191,21 @@ export const CommonCustomView = ({
                 ? <div> Загрузка ...</div>
                 : 
                 <>
-                    {Array(rows).fill().map((_, index) => (
+                        {Array(rows).fill().map((_, index) => (
                             <>
-                               <div 
-                                    key={index} 
-                                    className={StyleSlider.slider} 
-                                    style={mobile ? { overflow: 'hidden' } : {}}
-                                    onWheel={(evt) => {
-                                        handleWheel(evt)
-                                    }}
-
-                                >
-
-                                    <div 
-                                        id={`Carusel_${index}`} 
-                                        className={StyleCarusel.slides__container} 
-                                        style={{
-                                            display: "flex", 
-                                            gap: "20px", 
-                                            transition: 'transform 0.6s ease-in-out', 
-                                            transform: `translateX(-${slideIndex * slideWidth}%)` 
-                                            
-                                        }}
-
-                                        >
-
-                                            {onlyImgsRepeatMain.map((array, index) => {
-                                                return (
-                                                    <React.Fragment key={index}>
-                                                        {array.map((image, innerIndex) => (
-                                                        <div 
-                                                                className={StyleCarusel.slide} 
-                                                                key={innerIndex}  
-                                                                onTouchStart={(evt) => {
-                                                                    setSelectedImages(index)
-                                                                }}
-                                                            >
-                                                            <img  
-                                                                style={{ 
-                                                                maxWidth: "250px", 
-                                                                maxHeight: "200px",
-                                                                height: "100%", 
-                                                                borderRadius: "10px",
-                                                                objectFit: 'cover'
-                                                                }} 
-                                                                src={image} 
-                                                                alt={`Slide ${index + 1}`} 
-                                                            /> 
-                                                        </div>
-                                                    ))}
-                                                    </React.Fragment>
-                                                );
-                                            })}
-                                            
-                                    </div>
-                                    <button id={`${index}`} className={StyleCarusel.prev_btn} onClick={(evt) => {handlePrevClick(evt,index)}}>Назад</button>
-                                    <button id={`${index}`} className={StyleCarusel.pext_btn} onClick={(evt) => {handleNextClick(evt,index)}}>Вперед</button>
-                                </div>
+                                <Row 
+                                    index={index} 
+                                    onlyImgsRepeatMainSingle={onlyImgsRepeatMainSingle}
+                                    speed={speed}
+                                    autoplay={autoplay}
+                                    handleWheel={handleWheel}
+                                    slideWidth={slideWidth} 
+                                    lengthArrayImageFromData={lengthArrayImageFromData} 
+                                />
                             </>
-                     ))}
+                        ))}
                 </>
+                        
             )}
 
             {typeOfTheComponent === 'slider' && (
@@ -316,19 +213,13 @@ export const CommonCustomView = ({
                 ? <div> Загрузка ...</div>
                 : 
                 <>
-                    <div className={StyleSlider.wrapper} style={{overflow: 'hidden', transition: 'transform 0.6s ease-in-out'}}>
-                        <button onClick={prevSlide} className={StyleSlider.btn__prev}>
-                            &lt;
-                        </button>
-                        <img
-                            className={StyleSlider.slide__img}
-                            src={arrayImageFromData[activeIndex]}
-                            alt={`Slide ${activeIndex}`}
-                        />
-                        <button onClick={nextSlide} className={StyleSlider.btn__next}>
-                            &gt;
-                        </button>
-                    </div>
+                    <Slider
+                        lengthArrayImageFromData={lengthArrayImageFromData} 
+                        speed={speed} 
+                        autoplay={autoplay}
+                        arrayImageFromData={arrayImageFromData}
+                        
+                    />
                 </>
             )}
         </>
@@ -337,6 +228,184 @@ export const CommonCustomView = ({
 }
 
 
-const Row = () => {
+const Row =  ({ 
+    index,
+    onlyImgsRepeatMainSingle,
+    autoplay,
+    speed,
+    lengthArrayImageFromData,
+    handleWheel,
+    slideWidth 
+        }) => {
+
+    const [ slideIndex, setSlideIndex ] = useState(0)
+    const sliderRef = useRef(null);
+    const caruselContainerRef = useRef(null);
+
+
+    // Функция для кнопки carusel вправо
+    const handlePrevClick = () => {
+        setSlideIndex(prevIndex => (prevIndex - 1 + lengthArrayImageFromData) % lengthArrayImageFromData);
+    };
+
+    // Функция для кнопки carusel влево
+    const handleNextClick = (e, index) => {
+        setSlideIndex(prevIndex => (prevIndex + 1) % lengthArrayImageFromData);
+    };
     
+    // Автоплэй для капусели
+    useEffect(() => {
+        if(autoplay) {
+            const intervalId = setInterval(() => {
+                setSlideIndex(prevIndex => (prevIndex + 1) % lengthArrayImageFromData);
+            }, speed); 
+            
+            return () => clearInterval(intervalId);
+        }
+      }, [autoplay, lengthArrayImageFromData, speed]);
+
+      const [ array, setArray ] = useState([onlyImgsRepeatMainSingle])
+      console.log(array)
+  
+
+      useEffect(() => {
+        if (sliderRef.current && caruselContainerRef.current) {
+          const slider = sliderRef.current.getBoundingClientRect();
+          const carusel = caruselContainerRef.current.getBoundingClientRect();
+      
+          if (carusel.right < slider.right) {
+            const firstElement = onlyImgsRepeatMainSingle.pop();
+            // onlyImgsRepeatMainSingle.shift();
+            onlyImgsRepeatMainSingle.push(firstElement)
+            setArray(onlyImgsRepeatMainSingle);
+            console.log("Сейчас нужно добавить элементы ");
+          } else {
+            console.log("Сейчас элементов типо достаточно");
+          }
+        }
+      }, [slideIndex, onlyImgsRepeatMainSingle]);
+      
+
+
+    //Получение координат слайдера
+
+    return (
+        <>
+            <div 
+                key={index} 
+                className={StyleSlider.slider} 
+                onWheel={(evt) => {
+                    handleWheel(evt)
+                }}
+                ref={sliderRef}
+
+                >
+
+                <div 
+                    id={`Carusel_${index}`} 
+                    className={StyleCarusel.slides__container} 
+                    style={{
+                        display: "flex", 
+                        gap: "20px", 
+                        transition: 'transform 0.6s ease-in-out', 
+                        transform: `translateX(-${slideIndex * slideWidth}%)` 
+                        
+                    }}
+                    
+                    >
+
+                    {array.map((image, index) => (
+                        <div 
+                            className={StyleCarusel.slide} 
+                            key={index}
+                            ref={caruselContainerRef}
+                        >
+                            <img
+                                style={{
+                                    maxWidth: "250px",
+                                    maxHeight: "200px",
+                                    height: "100%",
+                                    borderRadius: "10px",
+                                    objectFit: "cover",
+                                }}
+                                src={image}
+                                alt={`Slide ${index + 1}`}
+                            />
+                        </div>
+                    ))}
+                        
+                </div>
+            </div>
+            <button id={`${index}`} className={StyleCarusel.prev_btn} onClick={(evt) => {handlePrevClick()}}>Назад</button>
+            <button id={`${index}`} className={StyleCarusel.pext_btn} onClick={(evt) => {handleNextClick()}}>Вперед</button>
+        </>
+        
+    )
+}
+const Slider =  ({ 
+    autoplay,
+    arrayImageFromData,
+    lengthArrayImageFromData,
+    speed,
+    }) => {
+
+
+
+    const [ slideIndex, setSlideIndex ] = useState(0)
+    const [ activeIndex, setActiveIndex ] = useState(0)
+    // Функция для кнопки slider вправо
+    const nextSlide = () => {
+        setActiveIndex((prevIndex) =>
+            prevIndex === arrayImageFromData.length - 1 ? 0 : prevIndex + 1
+        );
+    };
+
+    // Функция для кнопки slider влево
+    const prevSlide = () => {
+        setActiveIndex(prevIndex => {
+            // Если текущий индекс - 1, переходим к последнему слайду
+            if (prevIndex === 0) {
+                return arrayImageFromData.length - 1;
+            } else {
+                // В противном случае, просто переходим к предыдущему слайду
+                return prevIndex - 1;
+            }
+        });
+    };
+    
+    
+    
+    // Автоплэй для слайдера
+    useEffect(() => {
+        if(autoplay) {
+            if(activeIndex < lengthArrayImageFromData - 1) {
+                const autoPlayInterval = setInterval(nextSlide, speed)
+                return () => {
+                    clearInterval(autoPlayInterval)
+                }
+            } else {
+                setActiveIndex(0)
+            }
+        }
+    }, [autoplay, lengthArrayImageFromData, speed, activeIndex, nextSlide])
+
+
+
+    return (    
+        <div className={StyleSlider.wrapper} style={{overflow: 'hidden', transition: 'transform 0.6s ease-in-out'}}>
+            <button onClick={prevSlide} className={StyleSlider.btn__prev}>
+                &lt;
+            </button>
+
+            <img
+                className={StyleSlider.slide__img}
+                src={arrayImageFromData[activeIndex]}
+                alt={`Slide ${activeIndex}`}
+            />
+
+            <button onClick={nextSlide} className={StyleSlider.btn__next}>
+                &gt;
+            </button>
+        </div>
+    )
 }

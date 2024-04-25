@@ -191,14 +191,14 @@ export default function Home({params}) {
 
                   <CommonCustomView
                     endpoint={[
-                      [`http://localhost:3000/data_img_1.json` ],
-                      [`http://localhost:3000/data_img_1.json`, `http://localhost:3000/data_img_2.json` ]
+                      `http://localhost:3000/data_img_1.json` ,
+
                     ]}
                     settings={{
                       speed: 15000,
                       rows: 2,
-                      autoplay: true,
-                      typeOfTheComponent:'carusel',
+                      autoplay: false,
+                      typeOfTheComponent: 'carusel'
                     }}
                     styles={styles}
                   />
